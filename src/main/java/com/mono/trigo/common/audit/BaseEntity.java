@@ -1,4 +1,4 @@
-package com.mono.trigo.common;
+package com.mono.trigo.common.audit;
 
 import lombok.Getter;
 import java.time.LocalDateTime;
@@ -15,13 +15,13 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Getter
 @MappedSuperclass // 다른 엔티티 클래스에서 상속 가능하게 함
 @EntityListeners(AuditingEntityListener.class) // 생성 및 수정 시간을 자동으로 관리
-public abstract class BaseTime {
+public abstract class BaseEntity {
 
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    private LocalDateTime updatedDate;
+    private LocalDateTime modifiedDate;
 
 }
