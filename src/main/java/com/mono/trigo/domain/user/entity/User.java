@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "Users")
 public class User extends BaseEntity {
 

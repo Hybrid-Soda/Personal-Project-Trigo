@@ -1,23 +1,30 @@
 package com.mono.trigo.domain.like.entity;
 
 import com.mono.trigo.common.audit.BaseEntity;
+import com.mono.trigo.domain.plan.entity.Plan;
+import com.mono.trigo.domain.user.entity.User;
 
 import lombok.*;
 import jakarta.persistence.*;
 
 @Getter
 @Setter
-@Entity
 @NoArgsConstructor
-@Table(name = "Likes")
+@AllArgsConstructor
+@Entity(name = "Likes")
 public class Like extends BaseEntity {
 
     @Id
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "like_id")
+    private Long id;
 
-    @Id
-    @Column(name = "plan_id", nullable = false)
-    private Long planId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "plan_id", nullable = false)
+    private Plan plan;
 
 }

@@ -1,15 +1,13 @@
 package com.mono.trigo.domain.spot.entity;
 
+import lombok.*;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Getter
 @Setter
-@Entity
 @NoArgsConstructor
-@Table(name = "Spots")
+@AllArgsConstructor
+@Entity(name = "Spots")
 public class Spot {
 
     @Id

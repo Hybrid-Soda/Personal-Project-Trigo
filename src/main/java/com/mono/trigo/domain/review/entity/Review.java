@@ -10,6 +10,7 @@ import jakarta.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "Reviews")
 public class Review extends BaseEntity {
 
