@@ -1,7 +1,7 @@
 package com.mono.trigo.domain.review.entity;
 
 import com.mono.trigo.common.audit.BaseEntity;
-import com.mono.trigo.domain.spot.entity.Spot;
+import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.user.entity.User;
 
 import lombok.*;
@@ -20,8 +20,8 @@ public class Review extends BaseEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "spot_id", nullable = false)
-    private Spot spot;
+    @JoinColumn(name = "content_id", nullable = false)
+    private Content content;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -30,8 +30,8 @@ public class Review extends BaseEntity {
     @Column(nullable = false)
     private Integer rating;
 
-    @Column
-    private String content;
+    @Column(name = "review_content")
+    private String reviewContent;
 
     @Lob
     @Column(name = "picture_list")

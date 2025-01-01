@@ -2,6 +2,7 @@ package com.mono.trigo.domain.plan.entity;
 
 import com.mono.trigo.common.audit.BaseEntity;
 import com.mono.trigo.domain.user.entity.User;
+import com.mono.trigo.domain.region.entity.AreaDetail;
 
 import lombok.*;
 import jakarta.persistence.*;
@@ -23,6 +24,10 @@ public class Plan extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "area_detail_id", nullable = false)
+    private AreaDetail areaDetail;
 
     @Column(nullable = false, length = 100)
     private String title;
