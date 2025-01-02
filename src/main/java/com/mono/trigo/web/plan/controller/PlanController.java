@@ -1,5 +1,8 @@
 package com.mono.trigo.web.plan.controller;
 
+import com.mono.trigo.web.plan.dto.PlanRequest;
+import com.mono.trigo.web.plan.dto.PlanResponse;
+
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
@@ -47,15 +50,6 @@ public class PlanController {
     public ResponseEntity<String> deletePlan(@PathVariable Long planId) {
         // TODO: Add service logic to delete a plan
         return ResponseEntity.ok("Plan deleted successfully");
-    }
-
-    // DTO classes
-    public static class PlanRequest {
-        // Add fields and validation for plan creation/updating
-    }
-
-    public static class PlanResponse {
-        // Add fields for plan response
     }
 
 }
