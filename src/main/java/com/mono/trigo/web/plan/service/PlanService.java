@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,20 @@ public class PlanService {
         return CreatePlanResponse.builder()
                 .planId(savedPlan.getId())
                 .build();
+    }
+
+    public List<PlanResponse> getAllPlans() {
+        List<Plan> plans = planRepository.findAll();
+
+        return plans.stream().
+                map(plan -> PlanResponse.builder()
+                        .planId(plan.getId())
+                        .title(plan.getTitle())
+                        .description(plan.getDescription())
+                        .startDate(plan.getStartDate())
+                        .endDate(plan.getEndDate())
+                        .build())
+                .collect(Collectors.toList());
     }
 
     public PlanResponse getPlanById(Long planId) {

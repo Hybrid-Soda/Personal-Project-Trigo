@@ -31,9 +31,9 @@ public class PlanController {
 
     // 전체 일정 조회
     @GetMapping
-    public ResponseEntity<List<CreatePlanResponse>> getAllPlans() {
-        // TODO: Add service logic to fetch all plans
-        return ResponseEntity.ok(List.of());
+    public ResponseEntity<List<PlanResponse>> getAllPlans() {
+        List<PlanResponse> response = planService.getAllPlans();
+        return ResponseEntity.status(200).body(response);
     }
 
     // 특정 일정 조회
