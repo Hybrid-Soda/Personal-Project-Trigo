@@ -1,8 +1,9 @@
 package com.mono.trigo.web.plan.controller;
 
 import com.mono.trigo.web.plan.dto.PlanRequest;
-import com.mono.trigo.web.plan.dto.PlanResponse;
+import com.mono.trigo.web.plan.dto.CreatePlanResponse;
 
+import com.mono.trigo.web.plan.service.PlanService;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
@@ -17,25 +18,26 @@ import java.util.List;
 @RequestMapping("/api/v1/plans")
 public class PlanController {
 
+    private final PlanService planService;
+
     // 일정 생성
     @PostMapping
-    public ResponseEntity<String> createPlan(@RequestBody PlanRequest planRequest) {
-        // TODO: Add service logic to create a plan
-        return ResponseEntity.ok("Plan created successfully");
+    public ResponseEntity<CreatePlanResponse> createPlan(@RequestBody PlanRequest planRequest) {
+        return ResponseEntity.ok(planService.createPlan(1, planRequest));
     }
 
     // 전체 일정 조회
     @GetMapping
-    public ResponseEntity<List<PlanResponse>> getAllPlans() {
+    public ResponseEntity<List<CreatePlanResponse>> getAllPlans() {
         // TODO: Add service logic to fetch all plans
         return ResponseEntity.ok(List.of());
     }
 
     // 특정 일정 조회
     @GetMapping("/{planId}")
-    public ResponseEntity<PlanResponse> getPlanById(@PathVariable Long planId) {
+    public ResponseEntity<CreatePlanResponse> getPlanById(@PathVariable Long planId) {
         // TODO: Add service logic to fetch a specific plan by ID
-        return ResponseEntity.ok(new PlanResponse());
+        return ResponseEntity.ok(new CreatePlanResponse());
     }
 
     // 일정 수정

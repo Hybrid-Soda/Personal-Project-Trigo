@@ -7,7 +7,7 @@ import com.mono.trigo.domain.region.entity.AreaDetail;
 import lombok.*;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -21,13 +21,13 @@ public class Plan extends BaseEntity {
     @Column(name = "plan_id")
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+//    @ManyToOne
+//    @JoinColumn(name = "user_id", nullable = false)
+//    private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "area_detail_id", nullable = false)
-    private AreaDetail areaDetail;
+//    @ManyToOne
+//    @JoinColumn(name = "area_detail_id", nullable = false)
+//    private AreaDetail areaDetail;
 
     @Column(nullable = false, length = 100)
     private String title;
@@ -36,10 +36,10 @@ public class Plan extends BaseEntity {
     private String description;
 
     @Column(name = "start_date", nullable = false)
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date", nullable = false)
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Lob
     @Column
@@ -48,4 +48,16 @@ public class Plan extends BaseEntity {
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic = false;
 
+    @Builder
+    public Plan(String title, String description,
+                LocalDate startDate, LocalDate endDate, String detail, Boolean isPublic) {
+        this.title = title;
+        this.description = description;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.detail = detail;
+        this.isPublic = isPublic != null ? isPublic : false;
+    }
+//        this.user = user;
+//        this.areaDetail = areaDetail;
 }
