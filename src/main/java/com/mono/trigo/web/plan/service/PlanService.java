@@ -5,6 +5,7 @@ import com.mono.trigo.web.plan.dto.PlanRequest;
 import com.mono.trigo.web.plan.dto.CreatePlanResponse;
 import com.mono.trigo.domain.plan.repository.PlanRepository;
 
+import com.mono.trigo.web.plan.dto.PlanResponse;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
@@ -34,9 +35,20 @@ public class PlanService {
         Plan savedPlan = planRepository.save(plan);
 
         return CreatePlanResponse.builder()
-                .status("201")
-                .message("Plan created successfully")
                 .planId(savedPlan.getId())
+                .build();
+    }
+
+    public PlanResponse getPlanById(Long planId) {
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new RuntimeException("Plan not found"));
+
+        return PlanResponse.builder()
+                .planId(plan.getId())
+                .title(plan.getTitle())
+                .description(plan.getDescription())
+                .startDate(plan.getStartDate())
+                .endDate(plan.getEndDate())
                 .build();
     }
 

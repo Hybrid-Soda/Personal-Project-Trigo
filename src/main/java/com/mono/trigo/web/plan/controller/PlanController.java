@@ -3,6 +3,7 @@ package com.mono.trigo.web.plan.controller;
 import com.mono.trigo.web.plan.dto.PlanRequest;
 import com.mono.trigo.web.plan.dto.CreatePlanResponse;
 
+import com.mono.trigo.web.plan.dto.PlanResponse;
 import com.mono.trigo.web.plan.service.PlanService;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,9 @@ public class PlanController {
     // 일정 생성
     @PostMapping
     public ResponseEntity<CreatePlanResponse> createPlan(@RequestBody PlanRequest planRequest) {
-        return ResponseEntity.ok(planService.createPlan(1, planRequest));
+        CreatePlanResponse response = planService.createPlan(1, planRequest);
+        return ResponseEntity.status(201).body(response);
+
     }
 
     // 전체 일정 조회
@@ -35,9 +38,9 @@ public class PlanController {
 
     // 특정 일정 조회
     @GetMapping("/{planId}")
-    public ResponseEntity<CreatePlanResponse> getPlanById(@PathVariable Long planId) {
-        // TODO: Add service logic to fetch a specific plan by ID
-        return ResponseEntity.ok(new CreatePlanResponse());
+    public ResponseEntity<PlanResponse> getPlanById(@PathVariable Long planId) {
+        PlanResponse response = planService.getPlanById(planId);
+        return ResponseEntity.status(200).body(response);
     }
 
     // 일정 수정
