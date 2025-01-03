@@ -53,8 +53,8 @@ public class PlanController {
     // 일정 삭제
     @DeleteMapping("/{planId}")
     public ResponseEntity<String> deletePlan(@PathVariable Long planId) {
-        // TODO: Add service logic to delete a plan
-        return ResponseEntity.ok("Plan deleted successfully");
+        planService.deletePlan(planId);
+        return ResponseEntity.status(204).body("Plan deleted successfully");
     }
 
 }

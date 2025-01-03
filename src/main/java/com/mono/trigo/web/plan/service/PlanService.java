@@ -69,6 +69,13 @@ public class PlanService {
                 .build();
     }
 
+    public void deletePlan(Long planId) {
+        if (!planRepository.existsById(planId)) {
+            throw new RuntimeException("Plan not found");
+        }
+        planRepository.deleteById(planId);
+    }
+
     private void validateRequest(PlanRequest planRequest) {
         if (planRequest.getTitle() == null || planRequest.getTitle().isEmpty()) {
             throw new IllegalArgumentException("Title is required.");
