@@ -69,6 +69,20 @@ public class PlanService {
                 .build();
     }
 
+    public void updatePlan(Long planId, PlanRequest planRequest) {
+        validateRequest(planRequest);
+
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new RuntimeException("Plan not found"));
+
+        plan.setTitle(planRequest.getTitle());
+        plan.setDescription(planRequest.getDescription());
+        plan.setStartDate(planRequest.getStartDate());
+        plan.setEndDate(planRequest.getEndDate());
+        plan.setDetail(planRequest.getDetail());
+        planRepository.save(plan);
+    }
+
     public void deletePlan(Long planId) {
         if (!planRepository.existsById(planId)) {
             throw new RuntimeException("Plan not found");

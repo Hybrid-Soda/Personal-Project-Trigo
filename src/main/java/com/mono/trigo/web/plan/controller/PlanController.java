@@ -1,10 +1,10 @@
 package com.mono.trigo.web.plan.controller;
 
+import com.mono.trigo.web.plan.service.PlanService;
 import com.mono.trigo.web.plan.dto.PlanRequest;
+import com.mono.trigo.web.plan.dto.PlanResponse;
 import com.mono.trigo.web.plan.dto.CreatePlanResponse;
 
-import com.mono.trigo.web.plan.dto.PlanResponse;
-import com.mono.trigo.web.plan.service.PlanService;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
@@ -26,7 +26,6 @@ public class PlanController {
     public ResponseEntity<CreatePlanResponse> createPlan(@RequestBody PlanRequest planRequest) {
         CreatePlanResponse response = planService.createPlan(1, planRequest);
         return ResponseEntity.status(201).body(response);
-
     }
 
     // 전체 일정 조회
@@ -46,8 +45,8 @@ public class PlanController {
     // 일정 수정
     @PutMapping("/{planId}")
     public ResponseEntity<String> updatePlan(@PathVariable Long planId, @RequestBody PlanRequest planRequest) {
-        // TODO: Add service logic to update a plan
-        return ResponseEntity.ok("Plan updated successfully");
+        planService.updatePlan(planId, planRequest);
+        return ResponseEntity.status(200).body("Plan updated successfully");
     }
 
     // 일정 삭제
