@@ -40,4 +40,16 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String role = "member";
 
+    @Builder
+    public User(String email, String password, String nickname, LocalDate birthday,
+                Gender gender, String location, String role) {
+        this.email = email;
+        this.password = password;
+        this.nickname = nickname;
+        this.birthday = birthday;
+        this.gender = gender;
+        this.location = location;
+        this.role = role != null ? role : "member";
+    }
+
 }
