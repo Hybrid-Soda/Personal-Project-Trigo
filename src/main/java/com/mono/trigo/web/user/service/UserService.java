@@ -5,9 +5,11 @@ import com.mono.trigo.domain.user.repository.UserRepository;
 import com.mono.trigo.web.user.dto.SignupRequest;
 
 import com.mono.trigo.web.user.dto.SignupResponse;
+import com.mono.trigo.web.user.dto.UserResponse;
 import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -17,12 +19,25 @@ public class UserService {
 
     private final UserRepository userRepository;
 
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     public SignupResponse signup(SignupRequest signupRequest) {
 
+        String email = signupRequest.getEmail();
+        String password = signupRequest.getPassword();
+        String nickname = signupRequest.getNickname();
+
+        Boolean isExistEmail = userRepository.existsByEmail(email);
+        Boolean isExistNickname = userRepository.existsByNickname(nickname);
+
+//        if (isExistEmail || isExistNickname) {
+//            return;
+//        }
+
         User user = User.builder()
-                .email(signupRequest.getEmail())
-                .password(signupRequest.getPassword())
-                .nickname(signupRequest.getNickname())
+                .email(email)
+                .password(bCryptPasswordEncoder.encode(password))
+                .nickname(nickname)
                 .birthday(signupRequest.getBirthday())
                 .gender(signupRequest.getGender())
                 .location(signupRequest.getLocation())
@@ -32,6 +47,20 @@ public class UserService {
 
         return SignupResponse.builder()
                 .userId(savedUser.getId())
+                .build();
+    }
+
+    public UserResponse getUserById(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return UserResponse.builder()
+                .userId(user.getId())
+                .email(user.getEmail())
+                .nickname(user.getNickname())
+                .birthday(user.getBirthday())
+                .gender(user.getGender())
+                .location(user.getLocation())
                 .build();
     }
 

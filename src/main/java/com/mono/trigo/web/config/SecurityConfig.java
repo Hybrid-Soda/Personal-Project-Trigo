@@ -4,6 +4,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -29,16 +30,19 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 // http basic auth disable
                 .httpBasic(AbstractHttpConfigurer::disable)
+                // frame options disable for h2-console
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 // 경로별 인가 작업
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers(HttpMethod.POST, "/api/v1/users/signup").permitAll()
-                        .requestMatchers("/login", "/", "/signup").permitAll()
+                        .requestMatchers( "/h2-console/**").permitAll()
+                        .requestMatchers( "/api/v1/users/**").permitAll()
+                        .requestMatchers( "/api/v1/plans/**").permitAll()
+                        .requestMatchers( "/api/v1/contents/**").permitAll()
                         .requestMatchers("/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                // 세션 설정
-                .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // session disable
+                .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
 
