@@ -34,7 +34,9 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 // 경로별 인가 작업
                 .authorizeHttpRequests((auth) -> auth
+                        .requestMatchers( "/**").permitAll()
                         .requestMatchers( "/h2-console/**").permitAll()
+                        .requestMatchers( "/swagger-ui/**").permitAll()
                         .requestMatchers( "/api/v1/users/**").permitAll()
                         .requestMatchers( "/api/v1/plans/**").permitAll()
                         .requestMatchers( "/api/v1/contents/**").permitAll()
