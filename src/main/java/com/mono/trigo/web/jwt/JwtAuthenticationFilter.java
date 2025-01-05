@@ -33,7 +33,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         // token 정보 검증을 위한 AuthenticationManager 전달
         return authenticationManager.authenticate(authToken);
-
     }
 
     // 로그인 성공시 실행하는 메소드 (JWT 발급)
