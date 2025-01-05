@@ -14,6 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class JWTFilter extends OncePerRequestFilter {
 
@@ -32,11 +33,10 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // Authorization 헤더 검증
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-
             System.out.println("token null");
             filterChain.doFilter(request, response);
 
-            //조건이 해당되면 메소드 종료 (필수)
+            //조건이 해당되면 메소드 종료
             return;
         }
 
@@ -46,7 +46,6 @@ public class JWTFilter extends OncePerRequestFilter {
 
         // 토큰 소멸 시간 검증
         if (jwtUtil.isExpired(token)) {
-
             System.out.println("token expired");
             filterChain.doFilter(request, response);
 
@@ -61,7 +60,7 @@ public class JWTFilter extends OncePerRequestFilter {
         // userEntity를 생성하여 값 set
         User user = new User();
         user.setUsername(username);
-        user.setPassword("temppassword");
+        user.setPassword(UUID.randomUUID().toString());
         user.setRole(role);
 
         // UserDetails에 회원 정보 객체 담기

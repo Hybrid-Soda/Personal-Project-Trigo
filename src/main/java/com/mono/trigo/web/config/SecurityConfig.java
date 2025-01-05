@@ -23,6 +23,14 @@ import org.springframework.security.config.annotation.authentication.configurati
 @EnableWebSecurity
 public class SecurityConfig {
 
+    private static final String[] AUTH_WHITELIST = {
+            "/h2-console/**",
+            "/swagger-ui/**",
+            "/api/v1/users/**",
+            "/api/v1/plans/**",
+            "/api/v1/contents/**"
+    };
+
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JWTUtil jwtUtil;
 
@@ -42,7 +50,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfig corsConfig) throws Exception {
         return http
                 // csrf disable
                 .csrf(AbstractHttpConfigurer::disable)
@@ -54,18 +62,16 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 // authorization
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers( "/h2-console/**").permitAll()
-                        .requestMatchers( "/swagger-ui/**").permitAll()
-                        .requestMatchers( "/api/v1/users/**").permitAll()
-                        .requestMatchers( "/api/v1/plans/**").permitAll()
-                        .requestMatchers( "/api/v1/contents/**").permitAll()
-                        .requestMatchers("/api/v1/users/admin").hasRole("ADMIN")
+                        .requestMatchers(AUTH_WHITELIST).permitAll()
+                        .requestMatchers( "/api/v1/users/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 // authentication - JWTFilter를 JWTAuthenticationFilter 이전에 추가
                 .addFilterBefore(new JWTFilter(jwtUtil), JWTAuthenticationFilter.class)
                 // authentication - JWTAuthenticationFilter를 UsernamePasswordAuthenticationFilter와 동일한 위치에 추가
                 .addFilterAt(new JWTAuthenticationFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                // cors filter
+                .addFilter(corsConfig.corsFilter())
                 // session disable
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
