@@ -1,5 +1,6 @@
 package com.mono.trigo.web.config;
 
+import com.mono.trigo.web.jwt.JWTFilter;
 import com.mono.trigo.web.jwt.JWTUtil;
 import com.mono.trigo.web.jwt.JWTAuthenticationFilter;
 
@@ -53,16 +54,17 @@ public class SecurityConfig {
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 // authorization
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers( "/**").permitAll()
                         .requestMatchers( "/h2-console/**").permitAll()
                         .requestMatchers( "/swagger-ui/**").permitAll()
                         .requestMatchers( "/api/v1/users/**").permitAll()
                         .requestMatchers( "/api/v1/plans/**").permitAll()
                         .requestMatchers( "/api/v1/contents/**").permitAll()
-                        .requestMatchers("/api/v1/admin").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/users/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-                // authentication
+                // authentication - JWTFilter를 JWTAuthenticationFilter 이전에 추가
+                .addFilterBefore(new JWTFilter(jwtUtil), JWTAuthenticationFilter.class)
+                // authentication - JWTAuthenticationFilter를 UsernamePasswordAuthenticationFilter와 동일한 위치에 추가
                 .addFilterAt(new JWTAuthenticationFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 // session disable
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

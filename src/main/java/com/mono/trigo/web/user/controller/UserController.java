@@ -31,4 +31,9 @@ public class UserController {
         return ResponseEntity.status(200).body(response);
     }
 
+    @GetMapping("/admin")
+    public ResponseEntity<String> admin() {
+        return ResponseEntity.status(200).body("admin controller");
+    }
+
 }
