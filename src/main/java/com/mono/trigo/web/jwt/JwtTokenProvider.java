@@ -1,4 +1,4 @@
-package com.mono.trigo.web.user.jwt;
+package com.mono.trigo.web.jwt;
 
 import org.springframework.stereotype.Component;
 

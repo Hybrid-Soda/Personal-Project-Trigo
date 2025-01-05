@@ -23,24 +23,22 @@ public class UserService {
 
     public SignupResponse signup(SignupRequest signupRequest) {
 
-        String email = signupRequest.getEmail();
+        String username = signupRequest.getUsername();
         String password = signupRequest.getPassword();
         String nickname = signupRequest.getNickname();
 
-        Boolean isExistEmail = userRepository.existsByEmail(email);
-        Boolean isExistNickname = userRepository.existsByNickname(nickname);
+        Boolean isExistUsername = userRepository.existsByUsername(username);
 
-//        if (isExistEmail || isExistNickname) {
+//        if (isExistUsername) {
 //            return;
 //        }
 
         User user = User.builder()
-                .email(email)
+                .username(username)
                 .password(bCryptPasswordEncoder.encode(password))
                 .nickname(nickname)
                 .birthday(signupRequest.getBirthday())
                 .gender(signupRequest.getGender())
-                .location(signupRequest.getLocation())
                 .build();
 
         User savedUser = userRepository.save(user);
@@ -56,11 +54,10 @@ public class UserService {
 
         return UserResponse.builder()
                 .userId(user.getId())
-                .email(user.getEmail())
+                .username(user.getUsername())
                 .nickname(user.getNickname())
                 .birthday(user.getBirthday())
                 .gender(user.getGender())
-                .location(user.getLocation())
                 .build();
     }
 

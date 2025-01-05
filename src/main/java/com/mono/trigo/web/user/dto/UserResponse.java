@@ -11,10 +11,9 @@ import java.time.LocalDate;
 public class UserResponse {
 
     private Long userId;
-    private String email;
+    private String username;
     private String nickname;
     private LocalDate birthday;
     private Gender gender;
-    private String location;
 
 }

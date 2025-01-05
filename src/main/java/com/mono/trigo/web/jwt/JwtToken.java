@@ -1,4 +1,4 @@
-package com.mono.trigo.web.user.dto;
+package com.mono.trigo.web.jwt;
 
 import lombok.*;
 

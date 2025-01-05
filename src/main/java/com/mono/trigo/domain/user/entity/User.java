@@ -20,7 +20,7 @@ public class User extends BaseEntity {
     private Long id;
 
     @Column(nullable = false, length = 100)
-    private String email;
+    private String username;
 
     @Column(nullable = false)
     private String password;
@@ -34,21 +34,17 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Gender gender;
 
-    @Column
-    private String location;
-
     @Column(nullable = false, length = 50)
     private String role = "member";
 
     @Builder
-    public User(String email, String password, String nickname, LocalDate birthday,
-                Gender gender, String location, String role) {
-        this.email = email;
+    public User(String username, String password, String nickname, LocalDate birthday,
+                Gender gender, String role) {
+        this.username = username;
         this.password = password;
         this.nickname = nickname;
         this.birthday = birthday;
         this.gender = gender;
-        this.location = location;
         this.role = role != null ? role : "member";
     }
 
