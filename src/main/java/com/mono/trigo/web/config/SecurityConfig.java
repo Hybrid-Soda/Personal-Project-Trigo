@@ -1,6 +1,8 @@
 package com.mono.trigo.web.config;
 
-import com.mono.trigo.web.jwt.JwtAuthenticationFilter;
+import com.mono.trigo.web.jwt.JWTUtil;
+import com.mono.trigo.web.jwt.JWTAuthenticationFilter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -21,9 +23,11 @@ import org.springframework.security.config.annotation.authentication.configurati
 public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JWTUtil jwtUtil;
 
-    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration) {
+    public SecurityConfig(AuthenticationConfiguration authenticationConfiguration, JWTUtil jwtUtil) {
         this.authenticationConfiguration = authenticationConfiguration;
+        this.jwtUtil = jwtUtil;
     }
 
     @Bean
@@ -59,7 +63,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 // authentication
-                .addFilterAt(new JwtAuthenticationFilter(authenticationManager(authenticationConfiguration)), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(new JWTAuthenticationFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 // session disable
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
