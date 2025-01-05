@@ -39,13 +39,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authentication) {
-
+        System.out.println("success login");
     }
 
     // 로그인 실패시 실행하는 에소드
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException failed) {
-
+        System.out.println("fail login");
     }
 }
