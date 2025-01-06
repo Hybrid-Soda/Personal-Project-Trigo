@@ -41,6 +41,13 @@ public class UserController {
         return ResponseEntity.status(200).body("User updated successfully");
     }
 
+    // 회원 탈퇴
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+        userService.deleteUser(userId);
+        return ResponseEntity.status(204).body("User deleted successfully");
+    }
+
     // 관리자
     @GetMapping("/admin")
     public ResponseEntity<String> admin() {

@@ -52,6 +52,7 @@ public class UserService {
     }
 
     public UserResponse getUserById(Long userId) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -73,5 +74,13 @@ public class UserService {
         user.setBirthday(userRequest.getBirthday());
         user.setGender(userRequest.getGender());
         userRepository.save(user);
+    }
+
+    public void deleteUser(Long userId) {
+
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found");
+        }
+        userRepository.deleteById(userId);
     }
 }
