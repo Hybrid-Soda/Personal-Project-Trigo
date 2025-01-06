@@ -19,13 +19,13 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 
-public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final RefreshRepository refreshRepository;
     private final JWTUtil jwtUtil;
 
-    public JWTAuthenticationFilter(
+    public CustomLoginFilter(
             AuthenticationManager authenticationManager, RefreshRepository refreshRepository, JWTUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.refreshRepository = refreshRepository;

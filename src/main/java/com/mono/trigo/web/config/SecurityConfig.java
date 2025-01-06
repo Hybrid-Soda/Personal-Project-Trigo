@@ -1,8 +1,9 @@
 package com.mono.trigo.web.config;
 
+import com.mono.trigo.web.jwt.CustomLogoutFilter;
 import com.mono.trigo.web.jwt.JWTFilter;
 import com.mono.trigo.web.jwt.JWTUtil;
-import com.mono.trigo.web.jwt.JWTAuthenticationFilter;
+import com.mono.trigo.web.jwt.CustomLoginFilter;
 import com.mono.trigo.domain.user.repository.RefreshRepository;
 
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -27,8 +29,10 @@ public class SecurityConfig {
     private static final String[] AUTH_WHITELIST = {
             "/h2-console/**",
             "/swagger-ui/**",
-            "/api/v1/users/**",
-            "/api/v1/plans/**",
+            "/api/v1/",
+            "/api/v1/users/signup",
+            "/api/v1/users/login",
+            "/api/v1/plans",
             "/api/v1/contents/**"
     };
 
@@ -65,14 +69,18 @@ public class SecurityConfig {
                 // authorization
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers(AUTH_WHITELIST).permitAll()
+                        .requestMatchers("/api/v1/users/**").authenticated()
+                        .requestMatchers("/api/v1/plans/**").authenticated()
                         .requestMatchers( "/api/v1/users/admin").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
+                // 커스텀 logout filter 추가
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class)
                 // authentication - JWTFilter를 JWTAuthenticationFilter 이전에 추가
-                .addFilterBefore(new JWTFilter(jwtUtil), JWTAuthenticationFilter.class)
+                .addFilterBefore(new JWTFilter(jwtUtil), CustomLoginFilter.class)
                 // authentication - JWTAuthenticationFilter를 UsernamePasswordAuthenticationFilter와 동일한 위치에 추가
                 .addFilterAt(
-                        new JWTAuthenticationFilter(authenticationManager(authenticationConfiguration), refreshRepository, jwtUtil),
+                        new CustomLoginFilter(authenticationManager(authenticationConfiguration), refreshRepository, jwtUtil),
                         UsernamePasswordAuthenticationFilter.class)
                 // cors filter
                 .addFilter(corsConfig.corsFilter())

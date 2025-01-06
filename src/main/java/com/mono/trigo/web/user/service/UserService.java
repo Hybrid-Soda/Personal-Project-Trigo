@@ -1,15 +1,17 @@
 package com.mono.trigo.web.user.service;
 
 import com.mono.trigo.domain.user.entity.User;
-import com.mono.trigo.domain.user.repository.UserRepository;
-import com.mono.trigo.web.user.dto.SignupRequest;
-
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
-import lombok.extern.slf4j.Slf4j;
+import com.mono.trigo.web.user.dto.SignupRequest;
+import com.mono.trigo.domain.user.repository.UserRepository;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Service
@@ -31,9 +33,9 @@ public class UserService {
 
         Boolean isExistUsername = userRepository.existsByUsername(username);
 
-//        if (isExistUsername) {
-//            return;
-//        }
+        if (isExistUsername) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+        }
 
         User user = User.builder()
                 .username(username)
