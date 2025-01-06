@@ -24,6 +24,15 @@ public class JWTUtil {
                 Jwts.SIG.HS256.key().build().getAlgorithm());
     }
 
+    public String getCategory(String token) {
+
+        return Jwts.parser()
+                .verifyWith(secretKey).build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("category", String.class);
+    }
+
     // JWT 토큰에서 사용자 이름(username) 추출하는 메서드
     public String getUsername(String token) {
 
@@ -56,9 +65,10 @@ public class JWTUtil {
     }
 
     // JWT 토큰 생성 메서드 - username, role, 생성일, 만료일 정보를 저장
-    public String createJwt(String username, String role, Long expiredMs) {
-        
+    public String createJwt(String category, String username, String role, Long expiredMs) {
+
         return Jwts.builder()
+                .claim("category", category)
                 .claim("username", username)
                 .claim("role", role)
                 .issuedAt(new Date(System.currentTimeMillis()))
