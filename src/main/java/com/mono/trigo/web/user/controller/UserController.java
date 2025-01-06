@@ -4,20 +4,27 @@ import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
 import com.mono.trigo.web.user.service.UserService;
+import com.mono.trigo.web.user.service.ReissueService;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
 public class UserController {
 
     private final UserService userService;
+    private final ReissueService reissueService;
+
+    public UserController(UserService userService, ReissueService reissueService) {
+        this.userService = userService;
+        this.reissueService = reissueService;
+    }
 
     // 회원 가입
     @PostMapping("/signup")
@@ -47,10 +54,27 @@ public class UserController {
         return ResponseEntity.status(204).body("User deleted successfully");
     }
 
+    // 토큰 재발급
+    @PostMapping("/reissue")
+    public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
+        try {
+            // refreshToken 확인
+            String refreshToken = reissueService.getRefreshToken(request);
+            reissueService.validateRefreshToken(refreshToken);
+
+            // accessToken 갱신
+            String newAccessToken = reissueService.generateNewAccessToken(refreshToken);
+            response.setHeader("access", newAccessToken);
+
+            return ResponseEntity.status(200).body("Access token updated successfully");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body(e.getMessage());
+        }
+    }
+
     // 관리자
     @GetMapping("/admin")
     public ResponseEntity<String> admin() {
         return ResponseEntity.status(200).body("admin controller");
     }
-
 }

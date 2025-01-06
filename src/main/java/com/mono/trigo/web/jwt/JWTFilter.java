@@ -14,7 +14,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import java.io.IOException;
-import java.io.PrintWriter;
+import io.jsonwebtoken.ExpiredJwtException;
 
 public class JWTFilter extends OncePerRequestFilter {
 
@@ -49,7 +49,9 @@ public class JWTFilter extends OncePerRequestFilter {
     private boolean validateToken(String token, HttpServletResponse response) throws IOException {
 
         // 토큰 만료 여부 확인
-        if (jwtUtil.isExpired(token)) {
+        try {
+            jwtUtil.isExpired(token);
+        } catch (ExpiredJwtException e) {
             sendErrorResponse(response, "Access token expired");
             return false;
         }
