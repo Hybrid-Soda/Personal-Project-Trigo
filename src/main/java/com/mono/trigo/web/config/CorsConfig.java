@@ -23,7 +23,7 @@ public class CorsConfig {
         config.setAllowCredentials(true); // 자격 증명 정보를 포함할 수 있도록 설정 (예: 쿠키, 인증 헤더)
         config.addAllowedOrigin(CorsConfiguration.ALL); // 모든 도메인에서 요청을 허용
         config.addAllowedHeader(CorsConfiguration.ALL); // 모든 헤더를 허용
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE")); // 특정 HTTP 메서드를 허용
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE")); // 특정 HTTP 메서드를 허용
 
         source.registerCorsConfiguration("/**", config); // 특정 URL 패턴에 대해 CORS 설정 등록
         return new CorsFilter(source);

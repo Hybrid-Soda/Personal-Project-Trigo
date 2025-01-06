@@ -5,6 +5,7 @@ import com.mono.trigo.domain.user.repository.UserRepository;
 import com.mono.trigo.web.user.dto.SignupRequest;
 
 import com.mono.trigo.web.user.dto.SignupResponse;
+import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import lombok.extern.slf4j.Slf4j;
 
@@ -63,4 +64,14 @@ public class UserService {
                 .build();
     }
 
+    public void updateUser(Long userId, UserRequest userRequest) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setNickname(userRequest.getNickname());
+        user.setBirthday(userRequest.getBirthday());
+        user.setGender(userRequest.getGender());
+        userRepository.save(user);
+    }
 }
