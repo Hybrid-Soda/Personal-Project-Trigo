@@ -5,6 +5,8 @@ import com.mono.trigo.common.audit.BaseEntity;
 import lombok.*;
 import jakarta.persistence.*;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -18,7 +20,7 @@ public class User extends BaseEntity {
     private Long id;
 
     @Column(nullable = false, length = 100)
-    private String email;
+    private String username;
 
     @Column(nullable = false)
     private String password;
@@ -26,16 +28,24 @@ public class User extends BaseEntity {
     @Column(nullable = false, length = 50)
     private String nickname;
 
-    @Column(nullable = false, length = 10)
-    private String birthday;
+    @Column(nullable = false)
+    private LocalDate birthday;
 
     @Column(nullable = false)
-    private Boolean gender;
-
-    @Column
-    private String location;
+    private Gender gender;
 
     @Column(nullable = false, length = 50)
     private String role = "member";
+
+    @Builder
+    public User(String username, String password, String nickname, LocalDate birthday,
+                Gender gender, String role) {
+        this.username = username;
+        this.password = password;
+        this.nickname = nickname;
+        this.birthday = birthday;
+        this.gender = gender;
+        this.role = role != null ? role : "member";
+    }
 
 }
