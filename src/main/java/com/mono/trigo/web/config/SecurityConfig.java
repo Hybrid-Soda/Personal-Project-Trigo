@@ -3,6 +3,7 @@ package com.mono.trigo.web.config;
 import com.mono.trigo.web.jwt.JWTFilter;
 import com.mono.trigo.web.jwt.JWTUtil;
 import com.mono.trigo.web.jwt.JWTAuthenticationFilter;
+import com.mono.trigo.domain.user.repository.RefreshRepository;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,7 +51,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CorsConfig corsConfig) throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http, CorsConfig corsConfig, RefreshRepository refreshRepository) throws Exception {
         return http
                 // csrf disable
                 .csrf(AbstractHttpConfigurer::disable)
@@ -69,7 +71,9 @@ public class SecurityConfig {
                 // authentication - JWTFilter를 JWTAuthenticationFilter 이전에 추가
                 .addFilterBefore(new JWTFilter(jwtUtil), JWTAuthenticationFilter.class)
                 // authentication - JWTAuthenticationFilter를 UsernamePasswordAuthenticationFilter와 동일한 위치에 추가
-                .addFilterAt(new JWTAuthenticationFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAt(
+                        new JWTAuthenticationFilter(authenticationManager(authenticationConfiguration), refreshRepository, jwtUtil),
+                        UsernamePasswordAuthenticationFilter.class)
                 // cors filter
                 .addFilter(corsConfig.corsFilter())
                 // session disable

@@ -1,6 +1,9 @@
 package com.mono.trigo.web.user.service;
 
+import com.mono.trigo.domain.user.entity.Refresh;
 import com.mono.trigo.web.jwt.JWTUtil;
+import com.mono.trigo.web.user.dto.TokenResponse;
+import com.mono.trigo.domain.user.repository.RefreshRepository;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,14 +12,18 @@ import lombok.extern.slf4j.Slf4j;
 import io.jsonwebtoken.ExpiredJwtException;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 @Slf4j
 @Service
 public class ReissueService {
 
     private final JWTUtil jwtUtil;
+    private final RefreshRepository refreshRepository;
 
-    public ReissueService(JWTUtil jwtUtil) {
+    public ReissueService(JWTUtil jwtUtil, RefreshRepository refreshRepository) {
         this.jwtUtil = jwtUtil;
+        this.refreshRepository = refreshRepository;
     }
 
     public String getRefreshToken(HttpServletRequest request) {
@@ -54,10 +61,32 @@ public class ReissueService {
         }
     }
 
-    public String generateNewAccessToken(String refreshToken) {
+    public TokenResponse generateNewTokens(String refreshToken) {
         // 10분 동안 유효한 새 액세스 토큰 생성
         String username = jwtUtil.getUsername(refreshToken);
         String role = jwtUtil.getRole(refreshToken);
-        return jwtUtil.createJwt("access", username, role, 60*10*1000L);
+
+        String newAccess = jwtUtil.createJwt("access", username, role, 60*10*1000L);
+        String newRefresh = jwtUtil.createJwt("refresh", username, role, 60*60*24*1000L);
+
+        refreshRepository.deleteByRefresh(refreshToken);
+        addRefreshEntity(username, newRefresh, 60*60*24*1000L);
+
+        return TokenResponse.builder()
+                .accessToken(newAccess)
+                .refreshToken(newRefresh)
+                .build();
+    }
+
+    private void addRefreshEntity(String username, String refreshToken, Long expiredMs) {
+
+        Date date = new Date(System.currentTimeMillis() + expiredMs);
+
+        Refresh refreshEntity = new Refresh();
+        refreshEntity.setUsername(username);
+        refreshEntity.setRefresh(refreshToken);
+        refreshEntity.setExpiration(date.toString());
+
+        refreshRepository.save(refreshEntity);
     }
 }

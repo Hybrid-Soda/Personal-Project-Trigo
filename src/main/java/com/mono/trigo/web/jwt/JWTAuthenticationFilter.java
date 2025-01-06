@@ -1,5 +1,7 @@
 package com.mono.trigo.web.jwt;
 
+import com.mono.trigo.domain.user.entity.Refresh;
+import com.mono.trigo.domain.user.repository.RefreshRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -14,15 +16,19 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final RefreshRepository refreshRepository;
     private final JWTUtil jwtUtil;
 
-    public JWTAuthenticationFilter(AuthenticationManager authenticationManager, JWTUtil jwtUtil) {
+    public JWTAuthenticationFilter(
+            AuthenticationManager authenticationManager, RefreshRepository refreshRepository, JWTUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
+        this.refreshRepository = refreshRepository;
         this.jwtUtil = jwtUtil;
         // 로그인 경로 변경
         setFilterProcessesUrl("/api/v1/users/login");
@@ -59,6 +65,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String access = jwtUtil.createJwt("access", username, role, 60*10*1000L);
         String refresh = jwtUtil.createJwt("refresh", username, role, 60*60*24*1000L);
 
+        // refreshToken 저장
+        addRefreshEntity(username, refresh, 60*60*24*1000L);
+
         // accessToken > header / refreshToken > cookie
         response.setHeader("access", access);
         response.addCookie(createCookie(refresh));
@@ -79,5 +88,17 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         cookie.setHttpOnly(true);
 
         return cookie;
+    }
+
+    private void addRefreshEntity(String username, String refreshToken, Long expiredMs) {
+
+        Date date = new Date(System.currentTimeMillis() + expiredMs);
+
+        Refresh refreshEntity = new Refresh();
+        refreshEntity.setUsername(username);
+        refreshEntity.setRefresh(refreshToken);
+        refreshEntity.setExpiration(date.toString());
+
+        refreshRepository.save(refreshEntity);
     }
 }

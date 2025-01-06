@@ -1,11 +1,13 @@
 package com.mono.trigo.web.user.controller;
 
+import com.mono.trigo.web.user.dto.TokenResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
 import com.mono.trigo.web.user.service.UserService;
 import com.mono.trigo.web.user.service.ReissueService;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -63,8 +65,9 @@ public class UserController {
             reissueService.validateRefreshToken(refreshToken);
 
             // accessToken 갱신
-            String newAccessToken = reissueService.generateNewAccessToken(refreshToken);
-            response.setHeader("access", newAccessToken);
+            TokenResponse tokenResponse = reissueService.generateNewTokens(refreshToken);
+            response.setHeader("access", tokenResponse.getAccessToken());
+            response.addCookie(createCookie(tokenResponse.getRefreshToken()));
 
             return ResponseEntity.status(200).body("Access token updated successfully");
         } catch (IllegalArgumentException e) {
@@ -76,5 +79,13 @@ public class UserController {
     @GetMapping("/admin")
     public ResponseEntity<String> admin() {
         return ResponseEntity.status(200).body("admin controller");
+    }
+
+    private Cookie createCookie(String value) {
+        Cookie cookie = new Cookie("refresh", value);
+        cookie.setMaxAge(60*60*24);
+        cookie.setHttpOnly(true);
+
+        return cookie;
     }
 }
