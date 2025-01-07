@@ -56,4 +56,14 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
+    public void updateReview(Long reviewId, ReviewRequest reviewRequest) {
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new RuntimeException("Review not found"));
+
+        review.setRating(reviewRequest.getRating());
+        review.setReviewContent(reviewRequest.getReviewContent());
+        review.setPictureList(reviewRequest.getPictureList());
+        reviewRepository.save(review);
+    }
 }

@@ -21,6 +21,7 @@ public class ReviewController {
         this.reviewService = reviewService;
     }
 
+    // 리뷰 생성
     @PostMapping
     public ResponseEntity<CreateReviewResponse> createReview(
             @PathVariable Long contentId, @RequestBody ReviewRequest reviewRequest) {
@@ -28,9 +29,17 @@ public class ReviewController {
         return ResponseEntity.status(201).body(response);
     }
 
+    // 콘텐츠 별 리뷰 조회
     @GetMapping
     public ResponseEntity<List<ReviewResponse>> getReviewByContentId(@PathVariable Long contentId) {
         List<ReviewResponse> response = reviewService.getReviewByContentId(contentId);
         return ResponseEntity.status(200).body(response);
+    }
+
+    // 리뷰 수정
+    @PutMapping("/{reviewId}")
+    public ResponseEntity<String> updateReview(@PathVariable Long reviewId, @RequestBody ReviewRequest reviewRequest) {
+        reviewService.updateReview(reviewId, reviewRequest);
+        return ResponseEntity.status(200).body("Review updated successfully");
     }
 }
