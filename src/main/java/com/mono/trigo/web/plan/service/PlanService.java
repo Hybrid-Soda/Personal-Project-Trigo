@@ -16,10 +16,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class PlanService {
 
     private final PlanRepository planRepository;
+
+    public PlanService(PlanRepository planRepository) {
+        this.planRepository = planRepository;
+    }
 
     public CreatePlanResponse createPlan(Integer userId, PlanRequest planRequest) {
         validateRequest(planRequest);

@@ -15,11 +15,14 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/v1/plans")
 public class PlanController {
 
     private final PlanService planService;
+
+    public PlanController(PlanService planService) {
+        this.planService = planService;
+    }
 
     // 일정 생성
     @PostMapping
