@@ -37,7 +37,6 @@ public class UserHelper {
     }
 
     public User getCurrentUser() {
-        return userRepository.findById(Long.parseLong(getAuthenticatedUser().getUsername()))
-                .orElseThrow(() -> new IllegalArgumentException("authentication is not exist"));
+        return userRepository.findByUsername(getAuthenticatedUser().getUsername());
     }
 }

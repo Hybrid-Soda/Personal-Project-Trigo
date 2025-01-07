@@ -9,5 +9,5 @@ import lombok.Setter;
 @Builder
 public class CreateReviewResponse {
 
-    private Integer reviewId;
+    private Long reviewId;
 }

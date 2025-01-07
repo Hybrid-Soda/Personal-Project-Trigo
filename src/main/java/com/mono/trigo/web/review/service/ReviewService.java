@@ -1,31 +1,40 @@
 package com.mono.trigo.web.review.service;
 
-import com.mono.trigo.domain.review.entity.Review;
-import com.mono.trigo.domain.review.repository.ReviewRepository;
-import com.mono.trigo.web.review.dto.CreateReviewResponse;
 import com.mono.trigo.web.review.dto.ReviewRequest;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.mono.trigo.web.review.dto.CreateReviewResponse;
+
+import com.mono.trigo.domain.review.entity.Review;
+import com.mono.trigo.domain.user.impl.UserHelper;
+import com.mono.trigo.domain.review.repository.ReviewRepository;
+
 import org.springframework.stereotype.Service;
 
 @Service
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final UserHelper userHelper;
 
-    public ReviewService(ReviewRepository reviewRepository) {
+    public ReviewService(ReviewRepository reviewRepository, UserHelper userHelper) {
         this.reviewRepository = reviewRepository;
+        this.userHelper = userHelper;
     }
 
-    public CreateReviewResponse createReview(UserDetails userDetails, ReviewRequest reviewRequest) {
+    public CreateReviewResponse createReview(Long contentId, ReviewRequest reviewRequest) {
 
         Review review = Review.builder()
 //                .content(contentId)
-                .user(userDetails.getUsername())
+                .user(userHelper.getCurrentUser())
                 .rating(reviewRequest.getRating())
                 .reviewContent(reviewRequest.getReviewContent())
                 .pictureList(reviewRequest.getPictureList())
                 .build();
-        return null;
+
+        Review savedReview = reviewRepository.save(review);
+
+        return CreateReviewResponse.builder()
+                .reviewId(savedReview.getId())
+                .build();
     }
 
 }
