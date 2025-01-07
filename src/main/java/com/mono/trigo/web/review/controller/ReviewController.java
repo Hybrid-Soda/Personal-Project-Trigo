@@ -42,4 +42,11 @@ public class ReviewController {
         reviewService.updateReview(reviewId, reviewRequest);
         return ResponseEntity.status(200).body("Review updated successfully");
     }
+
+    // 리뷰 삭제
+    @DeleteMapping("{reviewId}")
+    public ResponseEntity<String> deleteReview(@PathVariable Long reviewId) {
+        reviewService.deleteReview(reviewId);
+        return ResponseEntity.status(204).body("Review deleted successfully");
+    }
 }

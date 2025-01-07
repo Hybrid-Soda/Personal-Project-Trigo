@@ -66,4 +66,12 @@ public class ReviewService {
         review.setPictureList(reviewRequest.getPictureList());
         reviewRepository.save(review);
     }
+
+    public void deleteReview(Long reviewId) {
+
+        if (!reviewRepository.existsById(reviewId)) {
+            throw new RuntimeException("Plan not found");
+        }
+        reviewRepository.deleteById(reviewId);
+    }
 }
