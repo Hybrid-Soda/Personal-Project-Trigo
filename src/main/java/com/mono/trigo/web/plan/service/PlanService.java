@@ -48,8 +48,8 @@ public class PlanService {
     public List<PlanResponse> getAllPlans() {
         List<Plan> plans = planRepository.findAll();
 
-        return plans.stream().
-                map(plan -> PlanResponse.builder()
+        return plans.stream()
+                .map(plan -> PlanResponse.builder()
                         .planId(plan.getId())
                         .title(plan.getTitle())
                         .description(plan.getDescription())

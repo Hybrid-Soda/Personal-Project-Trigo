@@ -2,10 +2,13 @@ package com.mono.trigo.web.review.controller;
 
 import com.mono.trigo.web.review.dto.CreateReviewResponse;
 import com.mono.trigo.web.review.dto.ReviewRequest;
+import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.review.service.ReviewService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -25,4 +28,9 @@ public class ReviewController {
         return ResponseEntity.status(201).body(response);
     }
 
+    @GetMapping
+    public ResponseEntity<List<ReviewResponse>> getReviewByContentId(@PathVariable Long contentId) {
+        List<ReviewResponse> response = reviewService.getReviewByContentId(contentId);
+        return ResponseEntity.status(200).body(response);
+    }
 }

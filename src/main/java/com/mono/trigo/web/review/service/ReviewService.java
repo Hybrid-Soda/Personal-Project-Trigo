@@ -7,7 +7,12 @@ import com.mono.trigo.domain.review.entity.Review;
 import com.mono.trigo.domain.user.impl.UserHelper;
 import com.mono.trigo.domain.review.repository.ReviewRepository;
 
+import com.mono.trigo.web.review.dto.ReviewResponse;
+import com.mono.trigo.web.review.dto.ReviewUserResponse;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ReviewService {
@@ -35,6 +40,20 @@ public class ReviewService {
         return CreateReviewResponse.builder()
                 .reviewId(savedReview.getId())
                 .build();
+    }
+
+    public List<ReviewResponse> getReviewByContentId(Long contentId) {
+        List<Review> reviews = reviewRepository.findAll(); // 나중에 contentId 이용해서 가져오는걸로 변경
+
+        return reviews.stream()
+                .map(review -> ReviewResponse.builder()
+                        .reviewId(review.getId())
+                        .rating(review.getRating())
+                        .reviewContent(review.getReviewContent())
+                        .pictureList(review.getPictureList())
+                        .reviewUserResponse(new ReviewUserResponse(review.getUser()))
+                        .build())
+                .collect(Collectors.toList());
     }
 
 }
