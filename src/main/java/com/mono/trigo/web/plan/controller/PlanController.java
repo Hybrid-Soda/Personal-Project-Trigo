@@ -59,4 +59,17 @@ public class PlanController {
         return ResponseEntity.status(204).body("Plan deleted successfully");
     }
 
+    // 일정 좋아요
+    @PostMapping("/{planId}/likes")
+    public ResponseEntity<String> createLikePlan(@PathVariable Long planId) {
+        planService.createLikePlan(planId);
+        return ResponseEntity.status(200).body("create like successfully");
+    }
+
+    // 일정 좋아요 해제
+    @DeleteMapping("/{planId}/likes")
+    public ResponseEntity<String> deleteLikePlan(@PathVariable Long likeId) {
+        planService.deleteLikePlan(likeId);
+        return ResponseEntity.status(204).body("delete like successfully");
+    }
 }

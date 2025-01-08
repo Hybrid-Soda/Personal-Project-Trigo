@@ -1,8 +1,6 @@
 package com.mono.trigo.domain.plan.entity;
 
 import com.mono.trigo.common.audit.BaseEntity;
-import com.mono.trigo.domain.user.entity.User;
-import com.mono.trigo.domain.region.entity.AreaDetail;
 
 import lombok.*;
 import jakarta.persistence.*;

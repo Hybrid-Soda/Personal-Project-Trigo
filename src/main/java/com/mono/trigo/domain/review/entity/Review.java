@@ -7,8 +7,6 @@ import com.mono.trigo.domain.user.entity.User;
 import lombok.*;
 import jakarta.persistence.*;
 
-import javax.swing.text.html.parser.ContentModel;
-
 @Getter
 @Setter
 @NoArgsConstructor

@@ -1,14 +1,16 @@
 package com.mono.trigo.web.plan.service;
 
+import com.mono.trigo.domain.like.entity.Like;
 import com.mono.trigo.domain.plan.entity.Plan;
+import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.web.plan.dto.PlanRequest;
+import com.mono.trigo.web.plan.dto.PlanResponse;
+import com.mono.trigo.domain.user.impl.UserHelper;
 import com.mono.trigo.web.plan.dto.CreatePlanResponse;
 import com.mono.trigo.domain.plan.repository.PlanRepository;
+import com.mono.trigo.domain.like.repository.LikeRepository;
 
-import com.mono.trigo.web.plan.dto.PlanResponse;
 import lombok.extern.slf4j.Slf4j;
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,9 +21,13 @@ import java.util.stream.Collectors;
 public class PlanService {
 
     private final PlanRepository planRepository;
+    private final LikeRepository likeRepository;
+    private final UserHelper userHelper;
 
-    public PlanService(PlanRepository planRepository) {
+    public PlanService(PlanRepository planRepository, LikeRepository likeRepository, UserHelper userHelper) {
         this.planRepository = planRepository;
+        this.likeRepository = likeRepository;
+        this.userHelper = userHelper;
     }
 
     public CreatePlanResponse createPlan(Integer userId, PlanRequest planRequest) {
@@ -91,6 +97,27 @@ public class PlanService {
             throw new RuntimeException("Plan not found");
         }
         planRepository.deleteById(planId);
+    }
+
+    public void createLikePlan(Long planId) {
+
+        User user = userHelper.getCurrentUser();
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new RuntimeException("Plan not found"));
+
+        Like like = Like.builder()
+                .user(user)
+                .plan(plan)
+                .build();
+
+        likeRepository.save(like);
+    }
+
+    public void deleteLikePlan(Long likeId) {
+        if (!likeRepository.existsById(likeId)) {
+            throw new RuntimeException("Like not found");
+        }
+        likeRepository.deleteById(likeId);
     }
 
     private void validateRequest(PlanRequest planRequest) {

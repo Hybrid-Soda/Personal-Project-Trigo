@@ -9,9 +9,9 @@ import jakarta.persistence.*;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Entity(name = "Likes")
+@Entity
+@Table(name = "likes", uniqueConstraints = @UniqueConstraint(
+        name = "like_uid", columnNames = {"user_id", "review_id"}))
 public class Like extends BaseEntity {
 
     @Id
@@ -26,5 +26,11 @@ public class Like extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "plan_id", nullable = false)
     private Plan plan;
+
+    @Builder
+    public Like(User user, Plan plan) {
+        this.user = user;
+        this.plan = plan;
+    }
 
 }
