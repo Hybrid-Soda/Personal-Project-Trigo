@@ -11,7 +11,7 @@ import jakarta.persistence.*;
 @Setter
 @Entity
 @Table(name = "likes", uniqueConstraints = @UniqueConstraint(
-        name = "like_uid", columnNames = {"user_id", "review_id"}))
+        name = "like_uid", columnNames = {"user_id", "plan_id"}))
 public class Like extends BaseEntity {
 
     @Id
@@ -33,4 +33,6 @@ public class Like extends BaseEntity {
         this.plan = plan;
     }
 
+    public Like() {
+    }
 }

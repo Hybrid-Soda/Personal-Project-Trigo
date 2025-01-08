@@ -54,22 +54,22 @@ public class PlanController {
 
     // 일정 삭제
     @DeleteMapping("/{planId}")
-    public ResponseEntity<String> deletePlan(@PathVariable Long planId) {
+    public ResponseEntity<Void> deletePlan(@PathVariable Long planId) {
         planService.deletePlan(planId);
-        return ResponseEntity.status(204).body("Plan deleted successfully");
+        return ResponseEntity.noContent().build();
     }
 
     // 일정 좋아요
     @PostMapping("/{planId}/likes")
     public ResponseEntity<String> createLikePlan(@PathVariable Long planId) {
         planService.createLikePlan(planId);
-        return ResponseEntity.status(200).body("create like successfully");
+        return ResponseEntity.status(201).body("Like created successfully");
     }
 
     // 일정 좋아요 해제
     @DeleteMapping("/{planId}/likes")
-    public ResponseEntity<String> deleteLikePlan(@PathVariable Long likeId) {
-        planService.deleteLikePlan(likeId);
-        return ResponseEntity.status(204).body("delete like successfully");
+    public ResponseEntity<Void> deleteLikePlan(@PathVariable Long planId) {
+        planService.deleteLikePlan(planId);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -51,9 +51,9 @@ public class UserController {
 
     // 회원 탈퇴
     @DeleteMapping("/{userId}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long userId) {
+    public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
-        return ResponseEntity.status(204).body("User deleted successfully");
+        return ResponseEntity.noContent().build();
     }
 
     // 토큰 재발급

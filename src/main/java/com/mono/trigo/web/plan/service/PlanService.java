@@ -12,6 +12,7 @@ import com.mono.trigo.domain.like.repository.LikeRepository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,6 +32,7 @@ public class PlanService {
     }
 
     public CreatePlanResponse createPlan(Integer userId, PlanRequest planRequest) {
+
         validateRequest(planRequest);
 
         Plan plan = Plan.builder()
@@ -52,6 +54,7 @@ public class PlanService {
     }
 
     public List<PlanResponse> getAllPlans() {
+
         List<Plan> plans = planRepository.findAll();
 
         return plans.stream()
@@ -66,6 +69,7 @@ public class PlanService {
     }
 
     public PlanResponse getPlanById(Long planId) {
+
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
 
@@ -79,6 +83,7 @@ public class PlanService {
     }
 
     public void updatePlan(Long planId, PlanRequest planRequest) {
+
         validateRequest(planRequest);
 
         Plan plan = planRepository.findById(planId)
@@ -93,6 +98,7 @@ public class PlanService {
     }
 
     public void deletePlan(Long planId) {
+
         if (!planRepository.existsById(planId)) {
             throw new RuntimeException("Plan not found");
         }
@@ -113,14 +119,18 @@ public class PlanService {
         likeRepository.save(like);
     }
 
-    public void deleteLikePlan(Long likeId) {
-        if (!likeRepository.existsById(likeId)) {
-            throw new RuntimeException("Like not found");
-        }
-        likeRepository.deleteById(likeId);
+    @Transactional
+    public void deleteLikePlan(Long planId) {
+
+        User user = userHelper.getCurrentUser();
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new RuntimeException("Plan not found"));
+
+        likeRepository.deleteByUserAndPlan(user, plan);
     }
 
     private void validateRequest(PlanRequest planRequest) {
+
         if (planRequest.getTitle() == null || planRequest.getTitle().isEmpty()) {
             throw new IllegalArgumentException("Title is required.");
         }
