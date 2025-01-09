@@ -1,5 +1,6 @@
 package com.mono.trigo.web.user.controller;
 
+import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.user.dto.TokenResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
@@ -14,6 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -54,6 +57,13 @@ public class UserController {
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 작성한 리뷰 조회
+    @GetMapping("/{userId}/reviews")
+    public ResponseEntity<List<ReviewResponse>> getReviewsByUserId(@PathVariable Long userId) {
+        List<ReviewResponse> response = userService.getReviewsByUserId(userId);
+        return ResponseEntity.status(200).body(response);
     }
 
     // 토큰 재발급

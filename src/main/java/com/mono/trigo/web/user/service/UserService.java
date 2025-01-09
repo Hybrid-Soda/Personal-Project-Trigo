@@ -1,6 +1,10 @@
 package com.mono.trigo.web.user.service;
 
+import com.mono.trigo.domain.review.entity.Review;
+import com.mono.trigo.domain.review.repository.ReviewRepository;
 import com.mono.trigo.domain.user.entity.User;
+import com.mono.trigo.web.review.dto.ReviewResponse;
+import com.mono.trigo.web.review.dto.ReviewUserResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
@@ -13,15 +17,23 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ReviewRepository reviewRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(
+            UserRepository userRepository,
+            ReviewRepository reviewRepository,
+            BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.reviewRepository = reviewRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
@@ -79,5 +91,24 @@ public class UserService {
             throw new RuntimeException("User not found");
         }
         userRepository.deleteById(userId);
+    }
+
+    public List<ReviewResponse> getReviewsByUserId(Long userId) {
+
+        if (!userRepository.existsById(userId)) {
+            throw new RuntimeException("User not found");
+        }
+
+        List<Review> reviews = reviewRepository.findByUserId(userId);
+
+        return reviews.stream()
+                .map(review -> ReviewResponse.builder()
+                        .reviewId(review.getId())
+                        .rating(review.getRating())
+                        .reviewContent(review.getReviewContent())
+                        .pictureList(review.getPictureList())
+                        .reviewUserResponse(new ReviewUserResponse(review.getUser()))
+                        .build())
+                .collect(Collectors.toList());
     }
 }
