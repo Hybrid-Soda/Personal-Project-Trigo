@@ -1,4 +1,4 @@
-package com.mono.trigo.domain.region.entity;
+package com.mono.trigo.domain.area.entity;
 
 import lombok.*;
 import jakarta.persistence.*;
