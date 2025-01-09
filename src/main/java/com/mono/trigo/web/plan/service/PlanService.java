@@ -31,11 +31,13 @@ public class PlanService {
         this.userHelper = userHelper;
     }
 
-    public CreatePlanResponse createPlan(Integer userId, PlanRequest planRequest) {
+    public CreatePlanResponse createPlan(PlanRequest planRequest) {
 
         validateRequest(planRequest);
+        User user = userHelper.getCurrentUser();
 
         Plan plan = Plan.builder()
+                .user(user)
                 .title(planRequest.getTitle())
                 .description(planRequest.getDescription())
                 .startDate(planRequest.getStartDate())
@@ -43,7 +45,6 @@ public class PlanService {
                 .detail(planRequest.getDetail())
                 .isPublic(false)
                 .build();
-//                .user(plan.getUser())
 //                .areaDetail(plan.getAreaDetail())
 
         Plan savedPlan = planRepository.save(plan);
@@ -59,6 +60,7 @@ public class PlanService {
 
         return plans.stream()
                 .map(plan -> PlanResponse.builder()
+                        .userId(plan.getUser().getId())
                         .planId(plan.getId())
                         .title(plan.getTitle())
                         .description(plan.getDescription())
@@ -74,6 +76,7 @@ public class PlanService {
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
 
         return PlanResponse.builder()
+                .userId(plan.getUser().getId())
                 .planId(plan.getId())
                 .title(plan.getTitle())
                 .description(plan.getDescription())

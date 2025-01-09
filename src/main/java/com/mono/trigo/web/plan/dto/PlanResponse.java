@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class PlanResponse {
 
     private Long planId; // 일정 ID
+    private Long userId; // 유저 ID
 //    private Long areaDetailId; // 지역 ID
     private String detail; // 여행지 ID 목록
     private String title; // 일정 제목

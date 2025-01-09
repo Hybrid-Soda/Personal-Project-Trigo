@@ -27,7 +27,7 @@ public class PlanController {
     // 일정 생성
     @PostMapping
     public ResponseEntity<CreatePlanResponse> createPlan(@RequestBody PlanRequest planRequest) {
-        CreatePlanResponse response = planService.createPlan(1, planRequest);
+        CreatePlanResponse response = planService.createPlan(planRequest);
         return ResponseEntity.status(201).body(response);
     }
 
