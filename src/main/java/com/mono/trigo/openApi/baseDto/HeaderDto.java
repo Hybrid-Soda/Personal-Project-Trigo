@@ -1,4 +1,4 @@
-package com.mono.trigo.openApi.dto;
+package com.mono.trigo.openApi.baseDto;
 
 import lombok.*;
 

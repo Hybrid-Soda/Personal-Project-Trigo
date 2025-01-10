@@ -1,13 +1,15 @@
 package com.mono.trigo.openApi.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mono.trigo.openApi.dto.ResponseDto;
-import com.mono.trigo.openApi.dto.WrapperDto;
+
+import com.mono.trigo.openApi.dto.AreaCodeDto;
+import com.mono.trigo.domain.area.entity.Area;
 import com.mono.trigo.openApi.util.OpenApiService;
 import com.mono.trigo.domain.area.repository.AreaRepository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -21,23 +23,16 @@ public class AreaService {
         this.openApiService = openApiService;
     }
 
-    public void createArea() {
+    public void saveAreas() {
 
-        WrapperDto response = openApiService.connectOpenApi("areaCode1");
-
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(response);
-            System.out.println("Response as JSON String: ");
-            System.out.println(jsonString);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        List<AreaCodeDto> response = openApiService.connectOpenApi("areaCode1", AreaCodeDto.class);
         System.out.println(response);
-        System.out.println(response.getResponse());
-        System.out.println(response.getResponse().getBody().getNumOfRows());
-        System.out.println(response.getResponse().getHeader().getResultCode());
-        System.out.println(response.getResponse().getBody().getItems().getItem().get(1));
-
+        for (AreaCodeDto areaCodeDto : response) {
+            Area area = Area.builder()
+                    .name(areaCodeDto.getName())
+                    .code(areaCodeDto.getCode())
+                    .build();
+            areaRepository.save(area);
+        }
     }
 }

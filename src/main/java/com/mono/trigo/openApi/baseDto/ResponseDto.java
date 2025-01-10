@@ -1,17 +1,17 @@
-package com.mono.trigo.openApi.dto;
+package com.mono.trigo.openApi.baseDto;
 
 import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class ResponseDto {
+public class ResponseDto<T> {
 
     private HeaderDto header;
-    private BodyDto body;
+    private BodyDto<T> body;
 
     @Builder
-    public ResponseDto(HeaderDto header, BodyDto body) {
+    public ResponseDto(HeaderDto header, BodyDto<T> body) {
         this.header = header;
         this.body = body;
     }

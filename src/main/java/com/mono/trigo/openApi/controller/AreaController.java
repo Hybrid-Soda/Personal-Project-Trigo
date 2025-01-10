@@ -17,8 +17,8 @@ public class AreaController {
     }
 
     @GetMapping("/area")
-    public ResponseEntity<Void> createArea() {
-        areaService.createArea();
+    public ResponseEntity<Void> saveAreas() {
+        areaService.saveAreas();
         return ResponseEntity.ok().build();
     }
 }
