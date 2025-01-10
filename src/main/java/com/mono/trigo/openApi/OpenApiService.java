@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.net.URI;
+
 @Component
 public class OpenApiService {
 
@@ -14,22 +16,22 @@ public class OpenApiService {
 
     public OpenApiService(@Value("#{environment['spring.open-api-token']}") String serviceKey) {
         this.serviceKey = serviceKey;
-        this.webClient = WebClient.builder()
-                .baseUrl("http://apis.data.go.kr/B551011/KorService1")
-                .build();
+        this.webClient = WebClient.builder().build();
     }
 
     public String connectOpenApi(String endpoint) {
 
-        String uri = UriComponentsBuilder.fromPath(endpoint)
+        String fullUri = UriComponentsBuilder.fromUriString(endpoint)
                 .queryParam("serviceKey", serviceKey)
-                .queryParam("numOfRows", 10)
+                .queryParam("numOfRows", 20)
                 .queryParam("pageNo", 1)
                 .queryParam("MobileOS", "ETC")
                 .queryParam("MobileApp", "testApp")
                 .queryParam("_type", "json")
                 .build()
                 .toString();
+
+        URI uri = URI.create(fullUri);
 
         return webClient
                 .get()

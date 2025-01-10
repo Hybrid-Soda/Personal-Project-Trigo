@@ -18,7 +18,7 @@ public class AreaService {
 
     public String createArea() {
 
-        String response = openApiService.connectOpenApi("/areaCode1");
+        String response = openApiService.connectOpenApi("http://apis.data.go.kr/B551011/KorService1/areaCode1");
         System.out.println("API Response: " + response);
         return response;
     }
