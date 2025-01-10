@@ -1,6 +1,7 @@
 package com.mono.trigo.openApi.util;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import com.mono.trigo.openApi.dto.ResponseDto;
+import com.mono.trigo.openApi.dto.WrapperDto;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -20,7 +21,7 @@ public class OpenApiService {
         this.webClient = WebClient.builder().build();
     }
 
-    public JsonNode connectOpenApi(String endpoint) {
+    public WrapperDto connectOpenApi(String endpoint) {
 
         String baseUri = "http://apis.data.go.kr/B551011/KorService1/";
         String fullUri = UriComponentsBuilder.fromUriString(baseUri + endpoint)
@@ -39,7 +40,7 @@ public class OpenApiService {
                 .get()
                 .uri(uri)
                 .retrieve()
-                .bodyToMono(JsonNode.class)
+                .bodyToMono(WrapperDto.class)
                 .block();
     }
 }
