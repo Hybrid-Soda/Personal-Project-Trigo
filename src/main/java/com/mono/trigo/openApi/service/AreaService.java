@@ -1,6 +1,8 @@
-package com.mono.trigo.openApi;
+package com.mono.trigo.openApi.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.mono.trigo.domain.area.repository.AreaRepository;
+import com.mono.trigo.openApi.util.OpenApiService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +18,9 @@ public class AreaService {
         this.openApiService = openApiService;
     }
 
-    public String createArea() {
+    public void createArea() {
 
-        String response = openApiService.connectOpenApi("http://apis.data.go.kr/B551011/KorService1/areaCode1");
-        System.out.println("API Response: " + response);
-        return response;
+        JsonNode response = openApiService.connectOpenApi("areaCode1");
+
     }
 }

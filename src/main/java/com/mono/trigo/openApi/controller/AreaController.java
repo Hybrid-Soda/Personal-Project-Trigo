@@ -1,5 +1,6 @@
-package com.mono.trigo.openApi;
+package com.mono.trigo.openApi.controller;
 
+import com.mono.trigo.openApi.service.AreaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,9 +17,8 @@ public class AreaController {
     }
 
     @GetMapping("/area")
-    public ResponseEntity<String> createArea() {
-
-        String response = areaService.createArea();
-        return ResponseEntity.ok().body(response);
+    public ResponseEntity<Void> createArea() {
+        areaService.createArea();
+        return ResponseEntity.ok().build();
     }
 }
