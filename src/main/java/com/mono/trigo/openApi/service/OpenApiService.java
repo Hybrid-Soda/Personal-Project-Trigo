@@ -4,7 +4,7 @@ package com.mono.trigo.openApi.service;
 import com.mono.trigo.domain.content.entity.ContentType;
 import com.mono.trigo.domain.content.repository.ContentRepository;
 import com.mono.trigo.domain.content.repository.ContentTypeRepository;
-import com.mono.trigo.openApi.dto.AreaCodeDto;
+import com.mono.trigo.openApi.dto.NameCodeDto;
 import com.mono.trigo.openApi.baseDto.WrapperDto;
 
 import com.mono.trigo.domain.area.entity.Area;
@@ -35,13 +35,13 @@ public class OpenApiService {
 
     public void saveAreas() {
 
-        ParameterizedTypeReference<WrapperDto<AreaCodeDto>> typeReference = new ParameterizedTypeReference<>(){};
-        List<AreaCodeDto> response = openApiHelper.connectOpenApi("areaCode1", typeReference, null);
+        ParameterizedTypeReference<WrapperDto<NameCodeDto>> typeReference = new ParameterizedTypeReference<>(){};
+        List<NameCodeDto> response = openApiHelper.connectOpenApi("areaCode1", typeReference, null);
 
-        for (AreaCodeDto areaCodeDto : response) {
+        for (NameCodeDto nameCodeDto : response) {
             Area area = Area.builder()
-                    .name(areaCodeDto.getName())
-                    .code(areaCodeDto.getCode())
+                    .name(nameCodeDto.getName())
+                    .code(nameCodeDto.getCode())
                     .build();
             areaRepository.save(area);
         }
@@ -50,19 +50,19 @@ public class OpenApiService {
     public void saveAreaDetails() {
 
         List<Area> areas = areaRepository.findAll();
-        ParameterizedTypeReference<WrapperDto<AreaCodeDto>> typeReference = new ParameterizedTypeReference<>(){};
+        ParameterizedTypeReference<WrapperDto<NameCodeDto>> typeReference = new ParameterizedTypeReference<>(){};
 
         for (Area area : areas) {
             Map<String, String> addParameter = new HashMap<>();
             addParameter.put("areaCode", area.getCode());
 
-            List<AreaCodeDto> response = openApiHelper.connectOpenApi("areaCode1", typeReference, addParameter);
+            List<NameCodeDto> response = openApiHelper.connectOpenApi("areaCode1", typeReference, addParameter);
 
-            for (AreaCodeDto areaCodeDto : response) {
+            for (NameCodeDto nameCodeDto : response) {
                 AreaDetail areadetail = AreaDetail.builder()
                         .area(area)
-                        .name(areaCodeDto.getName())
-                        .code(areaCodeDto.getCode())
+                        .name(nameCodeDto.getName())
+                        .code(nameCodeDto.getCode())
                         .build();
                 areaDetailRepository.save(areadetail);
             }
@@ -72,15 +72,51 @@ public class OpenApiService {
 
     public void saveContentTypes() {
 
-        ParameterizedTypeReference<WrapperDto<AreaCodeDto>> typeReference = new ParameterizedTypeReference<>(){};
-        List<AreaCodeDto> response = openApiHelper.connectOpenApi("categoryCode1", typeReference, null);
+        // OpenAPI 응답 타입 정의
+        ParameterizedTypeReference<WrapperDto<NameCodeDto>> typeReference = new ParameterizedTypeReference<>(){};
+        // OpenAPI 호출로 대분류 데이터를 가져옴
+        List<NameCodeDto> MajorCats = openApiHelper.connectOpenApi("categoryCode1", typeReference, null);
 
-        for (AreaCodeDto areaCodeDto : response) {
-            ContentType contentType = ContentType.builder()
-                    .parentCode("")
-                    .code("")
-                    .name("")
+        // 대분류 데이터를 ContentType 엔티티로 변환하여 저장
+        for (NameCodeDto nameCodeDto1 : MajorCats) {
+            ContentType MajorType1 = ContentType.builder()
+                    .parentCode(null)
+                    .code(nameCodeDto1.getCode())
+                    .name(nameCodeDto1.getName())
                     .build();
+            contentTypeRepository.save(MajorType1);
+        }
+
+        for (NameCodeDto nameCodeDto1 : MajorCats) {
+            Map<String, String> addParameter = new HashMap<>();
+            addParameter.put("cat1", nameCodeDto1.getCode());
+
+            // OpenAPI 호출로 중분류 데이터를 가져옴
+            List<NameCodeDto> MediumCats = openApiHelper.connectOpenApi("categoryCode1", typeReference, addParameter);
+
+            // 중분류 데이터를 ContentType 엔티티로 변환하여 저장
+            for (NameCodeDto nameCodeDto2 : MediumCats) {
+                ContentType MediumType = ContentType.builder()
+                        .parentCode(nameCodeDto1.getCode())
+                        .code(nameCodeDto2.getCode())
+                        .name(nameCodeDto2.getName())
+                        .build();
+                contentTypeRepository.save(MediumType);
+
+                addParameter.put("cat2", nameCodeDto2.getCode());
+                // OpenAPI 호출로 소분류 데이터를 가져옴
+                List<NameCodeDto> MinorCats = openApiHelper.connectOpenApi("categoryCode1", typeReference, addParameter);
+
+                // 소분류 데이터를 ContentType 엔티티로 변환하여 저장
+                for (NameCodeDto nameCodeDto3 : MinorCats) {
+                    ContentType MinorType = ContentType.builder()
+                            .parentCode(nameCodeDto2.getCode())
+                            .code(nameCodeDto3.getCode())
+                            .name(nameCodeDto3.getName())
+                            .build();
+                    contentTypeRepository.save(MinorType);
+                }
+            }
         }
     }
 
