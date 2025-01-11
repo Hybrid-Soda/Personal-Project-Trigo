@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity(name = "AreaDetails")
 public class AreaDetail {
 
@@ -23,6 +22,12 @@ public class AreaDetail {
     private String name;
 
     @Column(nullable = false)
-    private Integer code;
+    private String code;
 
+    @Builder
+    public AreaDetail(Area area, String name, String code) {
+        this.area = area;
+        this.name = name;
+        this.code = code;
+    }
 }
