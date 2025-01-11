@@ -1,6 +1,7 @@
 package com.mono.trigo.openApi.util;
 
 import com.mono.trigo.openApi.baseDto.WrapperDto;
+import com.mono.trigo.openApi.dto.AreaCodeDto;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,10 +23,7 @@ public class OpenApiService {
         this.webClient = WebClient.builder().build();
     }
 
-    public <T> List<T> connectOpenApi(String endpoint, Class<T> objectType) {
-
-        ParameterizedTypeReference<WrapperDto<T>> typeReference =
-                new ParameterizedTypeReference<>() {};
+    public <T> List<T> connectOpenApi(String endpoint, ParameterizedTypeReference<WrapperDto<T>> typeReference) {
 
         String baseUri = "http://apis.data.go.kr/B551011/KorService1/";
         String fullUri = UriComponentsBuilder.fromUriString(baseUri + endpoint)

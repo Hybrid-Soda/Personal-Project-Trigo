@@ -1,12 +1,14 @@
 package com.mono.trigo.openApi.service;
 
 
+import com.mono.trigo.openApi.baseDto.WrapperDto;
 import com.mono.trigo.openApi.dto.AreaCodeDto;
 import com.mono.trigo.domain.area.entity.Area;
 import com.mono.trigo.openApi.util.OpenApiService;
 import com.mono.trigo.domain.area.repository.AreaRepository;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,8 +27,9 @@ public class AreaService {
 
     public void saveAreas() {
 
-        List<AreaCodeDto> response = openApiService.connectOpenApi("areaCode1", AreaCodeDto.class);
-        System.out.println(response);
+        ParameterizedTypeReference<WrapperDto<AreaCodeDto>> typeReference = new ParameterizedTypeReference<>(){};
+        List<AreaCodeDto> response = openApiService.connectOpenApi("areaCode1", typeReference);
+
         for (AreaCodeDto areaCodeDto : response) {
             Area area = Area.builder()
                     .name(areaCodeDto.getName())
