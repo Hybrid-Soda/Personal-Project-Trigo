@@ -1,25 +1,27 @@
 package com.mono.trigo.openApi.util;
 
 import com.mono.trigo.openApi.baseDto.WrapperDto;
-import com.mono.trigo.openApi.dto.AreaCodeDto;
-import jakarta.annotation.Nullable;
-import org.springframework.core.ParameterizedTypeReference;
+
 import org.springframework.stereotype.Component;
 import org.springframework.beans.factory.annotation.Value;
-
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import jakarta.annotation.Nullable;
 
 @Component
-public class OpenApiService {
+public class OpenApiHelper {
 
     private final String serviceKey;
     private final WebClient webClient;
 
-    public OpenApiService(@Value("#{environment['spring.open-api-token']}") String serviceKey) {
+    public OpenApiHelper(@Value("#{environment['spring.open-api-token']}") String serviceKey) {
         this.serviceKey = serviceKey;
         this.webClient = WebClient.builder().build();
     }
@@ -27,7 +29,7 @@ public class OpenApiService {
     public <T> List<T> connectOpenApi(
             String endpoint,
             ParameterizedTypeReference<WrapperDto<T>> typeReference,
-            @Nullable String areaCode) {
+            @Nullable Map<String, String> parameters) {
 
         String baseUri = "http://apis.data.go.kr/B551011/KorService1/";
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(baseUri + endpoint)
@@ -38,8 +40,10 @@ public class OpenApiService {
                 .queryParam("MobileApp", "testApp")
                 .queryParam("_type", "json");
 
-        if (areaCode != null) {
-            uriBuilder.queryParam("areaCode", areaCode);
+        if (parameters != null) {
+            for (Map.Entry<String, String> entry : parameters.entrySet()) {
+                uriBuilder.queryParam(entry.getKey(), entry.getValue());
+            }
         }
 
         String fullUri = uriBuilder.build().toString();

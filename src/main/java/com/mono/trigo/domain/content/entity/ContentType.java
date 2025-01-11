@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity(name = "ContentTypes")
 public class ContentType {
 
@@ -15,16 +14,19 @@ public class ContentType {
     @Column(name = "content_type_id")
     private Long id;
 
-    @Column(nullable = false, length = 20)
-    private String cat1;
+    @Column(name = "parent_code", length = 10)
+    private String parentCode;
 
-    @Column(nullable = false, length = 20)
-    private String cat2;
+    @Column(nullable = false, length = 10)
+    private String code;
 
-    @Column(nullable = false, length = 20)
-    private String cat3;
-
-    @Column(nullable = false)
+    @Column(nullable = false, length = 50)
     private String name;
 
+    @Builder
+    public ContentType(String parentCode, String code, String name) {
+        this.parentCode = parentCode;
+        this.code = code;
+        this.name = name;
+    }
 }
