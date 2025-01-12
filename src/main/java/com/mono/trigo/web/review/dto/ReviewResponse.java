@@ -10,6 +10,7 @@ import lombok.Setter;
 public class ReviewResponse {
 
     private Long reviewId;
+    private Long contentId;
     private Integer rating;
     private String reviewContent;
     private String pictureList;

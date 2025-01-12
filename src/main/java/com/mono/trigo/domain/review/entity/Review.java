@@ -19,9 +19,9 @@ public class Review extends BaseEntity {
     @Column(name = "review_id")
     private Long id;
 
-//    @ManyToOne
-//    @JoinColumn(name = "content_id", nullable = false)
-//    private Content content;
+    @ManyToOne
+    @JoinColumn(name = "content_id", nullable = false)
+    private Content content;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -41,7 +41,7 @@ public class Review extends BaseEntity {
     public Review(Content content, User user, Integer rating,
                   String reviewContent, String pictureList) {
 
-//        this.content = content;
+        this.content = content;
         this.user = user;
         this.rating = rating;
         this.reviewContent = reviewContent;

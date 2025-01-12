@@ -9,6 +9,7 @@ import lombok.Setter;
 @Builder
 public class ReviewRequest {
 
+    private Long contentId;
     private Integer rating;
     private String reviewContent;
     private String pictureList;

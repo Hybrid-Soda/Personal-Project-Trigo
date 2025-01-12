@@ -1,5 +1,7 @@
 package com.mono.trigo.web.review.service;
 
+import com.mono.trigo.domain.content.entity.Content;
+import com.mono.trigo.domain.content.repository.ContentRepository;
 import com.mono.trigo.web.review.dto.ReviewRequest;
 import com.mono.trigo.web.review.dto.CreateReviewResponse;
 
@@ -18,17 +20,21 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final ContentRepository contentRepository;
     private final UserHelper userHelper;
 
-    public ReviewService(ReviewRepository reviewRepository, UserHelper userHelper) {
+    public ReviewService(ReviewRepository reviewRepository, ContentRepository contentRepository, UserHelper userHelper) {
         this.reviewRepository = reviewRepository;
+        this.contentRepository = contentRepository;
         this.userHelper = userHelper;
     }
 
     public CreateReviewResponse createReview(Long contentId, ReviewRequest reviewRequest) {
 
+        Content content = contentRepository.getReferenceById(contentId);
+
         Review review = Review.builder()
-//                .content(contentId)
+                .content(content)
                 .user(userHelper.getCurrentUser())
                 .rating(reviewRequest.getRating())
                 .reviewContent(reviewRequest.getReviewContent())
@@ -43,11 +49,12 @@ public class ReviewService {
     }
 
     public List<ReviewResponse> getReviewByContentId(Long contentId) {
-        List<Review> reviews = reviewRepository.findAll(); // 나중에 contentId 이용해서 가져오는걸로 변경
+        List<Review> reviews = reviewRepository.findByContentId(contentId);
 
         return reviews.stream()
                 .map(review -> ReviewResponse.builder()
                         .reviewId(review.getId())
+                        .contentId(review.getContent().getId())
                         .rating(review.getRating())
                         .reviewContent(review.getReviewContent())
                         .pictureList(review.getPictureList())
@@ -61,6 +68,9 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
 
+        Content content = contentRepository.getReferenceById(reviewRequest.getContentId());
+
+        review.setContent(content);
         review.setRating(reviewRequest.getRating());
         review.setReviewContent(reviewRequest.getReviewContent());
         review.setPictureList(reviewRequest.getPictureList());
