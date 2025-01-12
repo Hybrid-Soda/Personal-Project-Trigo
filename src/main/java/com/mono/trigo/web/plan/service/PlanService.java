@@ -1,5 +1,7 @@
 package com.mono.trigo.web.plan.service;
 
+import com.mono.trigo.domain.area.entity.AreaDetail;
+import com.mono.trigo.domain.area.repository.AreaDetailRepository;
 import com.mono.trigo.domain.like.entity.Like;
 import com.mono.trigo.domain.plan.entity.Plan;
 import com.mono.trigo.domain.user.entity.User;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -23,11 +26,18 @@ public class PlanService {
 
     private final PlanRepository planRepository;
     private final LikeRepository likeRepository;
+    private final AreaDetailRepository areaDetailRepository;
     private final UserHelper userHelper;
 
-    public PlanService(PlanRepository planRepository, LikeRepository likeRepository, UserHelper userHelper) {
+    public PlanService(
+            PlanRepository planRepository,
+            LikeRepository likeRepository,
+            AreaDetailRepository areaDetailRepository,
+            UserHelper userHelper) {
+
         this.planRepository = planRepository;
         this.likeRepository = likeRepository;
+        this.areaDetailRepository = areaDetailRepository;
         this.userHelper = userHelper;
     }
 
@@ -35,9 +45,11 @@ public class PlanService {
 
         validateRequest(planRequest);
         User user = userHelper.getCurrentUser();
+        AreaDetail areaDetail = areaDetailRepository.getReferenceById(planRequest.getAreaDetailId());
 
         Plan plan = Plan.builder()
                 .user(user)
+                .areaDetail(areaDetail)
                 .title(planRequest.getTitle())
                 .description(planRequest.getDescription())
                 .startDate(planRequest.getStartDate())
@@ -45,7 +57,6 @@ public class PlanService {
                 .detail(planRequest.getDetail())
                 .isPublic(false)
                 .build();
-//                .areaDetail(plan.getAreaDetail())
 
         Plan savedPlan = planRepository.save(plan);
 
@@ -60,8 +71,9 @@ public class PlanService {
 
         return plans.stream()
                 .map(plan -> PlanResponse.builder()
-                        .userId(plan.getUser().getId())
                         .planId(plan.getId())
+                        .userId(plan.getUser().getId())
+                        .areaDetail(plan.getAreaDetail())
                         .title(plan.getTitle())
                         .description(plan.getDescription())
                         .startDate(plan.getStartDate())
@@ -78,6 +90,7 @@ public class PlanService {
         return PlanResponse.builder()
                 .userId(plan.getUser().getId())
                 .planId(plan.getId())
+                .areaDetail(plan.getAreaDetail())
                 .title(plan.getTitle())
                 .description(plan.getDescription())
                 .startDate(plan.getStartDate())
@@ -92,6 +105,9 @@ public class PlanService {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
 
+        AreaDetail areaDetail = areaDetailRepository.getReferenceById(planRequest.getAreaDetailId());
+
+        plan.setAreaDetail(areaDetail);
         plan.setTitle(planRequest.getTitle());
         plan.setDescription(planRequest.getDescription());
         plan.setStartDate(planRequest.getStartDate());

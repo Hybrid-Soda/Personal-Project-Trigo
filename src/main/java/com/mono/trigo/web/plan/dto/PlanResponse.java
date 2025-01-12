@@ -1,5 +1,6 @@
 package com.mono.trigo.web.plan.dto;
 
+import com.mono.trigo.domain.area.entity.AreaDetail;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -13,7 +14,7 @@ public class PlanResponse {
 
     private Long planId; // 일정 ID
     private Long userId; // 유저 ID
-//    private Long areaDetailId; // 지역 ID
+    private AreaDetail areaDetail; // 지역 ID
     private String detail; // 여행지 ID 목록
     private String title; // 일정 제목
     private String description; // 일정 설명

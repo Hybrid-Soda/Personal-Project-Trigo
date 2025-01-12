@@ -2,6 +2,7 @@ package com.mono.trigo.domain.plan.entity;
 
 import com.mono.trigo.common.audit.BaseEntity;
 
+import com.mono.trigo.domain.area.entity.AreaDetail;
 import com.mono.trigo.domain.user.entity.User;
 import lombok.*;
 import jakarta.persistence.*;
@@ -24,9 +25,9 @@ public class Plan extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-//    @ManyToOne
-//    @JoinColumn(name = "area_detail_id", nullable = false)
-//    private AreaDetail areaDetail;
+    @ManyToOne
+    @JoinColumn(name = "area_detail_id", nullable = false)
+    private AreaDetail areaDetail;
 
     @Column(nullable = false, length = 100)
     private String title;
@@ -48,9 +49,10 @@ public class Plan extends BaseEntity {
     private Boolean isPublic = false;
 
     @Builder
-    public Plan(User user, String title, String description,
+    public Plan(User user, AreaDetail areaDetail, String title, String description,
                 LocalDate startDate, LocalDate endDate, String detail, Boolean isPublic) {
         this.user = user;
+        this.areaDetail = areaDetail;
         this.title = title;
         this.description = description;
         this.startDate = startDate;
@@ -58,5 +60,4 @@ public class Plan extends BaseEntity {
         this.detail = detail;
         this.isPublic = isPublic != null ? isPublic : false;
     }
-//        this.areaDetail = areaDetail;
 }
