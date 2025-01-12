@@ -9,7 +9,6 @@ import jakarta.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity(name = "Contents")
 public class Content extends BaseEntity {
 
@@ -50,4 +49,22 @@ public class Content extends BaseEntity {
     @Column(name = "first_image2", length = 512)
     private String firstImage2;
 
+    @Builder
+    public Content(
+            ContentType contentType, AreaDetail areaDetail,
+            String title, Double mapX, Double mapY,
+            String addr1, String addr2, String tel,
+            String firstImage, String firstImage2
+    ) {
+        this.contentType = contentType;
+        this.areaDetail = areaDetail;
+        this.title = title;
+        this.mapX = mapX;
+        this.mapY = mapY;
+        this.addr1 = addr1;
+        this.addr2 = addr2;
+        this.tel = tel;
+        this.firstImage = firstImage;
+        this.firstImage2 = firstImage2;
+    }
 }

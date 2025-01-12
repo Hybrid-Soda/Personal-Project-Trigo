@@ -1,9 +1,11 @@
 package com.mono.trigo.openApi.service;
 
 
+import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.content.entity.ContentType;
 import com.mono.trigo.domain.content.repository.ContentRepository;
 import com.mono.trigo.domain.content.repository.ContentTypeRepository;
+import com.mono.trigo.openApi.dto.ContentDto;
 import com.mono.trigo.openApi.dto.NameCodeDto;
 import com.mono.trigo.openApi.baseDto.WrapperDto;
 
@@ -29,13 +31,14 @@ public class OpenApiService {
 
     private final OpenApiHelper openApiHelper;
     private final AreaRepository areaRepository;
-    private final AreaDetailRepository areaDetailRepository;
     private final ContentRepository contentRepository;
+    private final AreaDetailRepository areaDetailRepository;
     private final ContentTypeRepository contentTypeRepository;
+    private final ParameterizedTypeReference<WrapperDto<NameCodeDto>> typeReference
+            = new ParameterizedTypeReference<>() {};
 
     public void saveAreas() {
 
-        ParameterizedTypeReference<WrapperDto<NameCodeDto>> typeReference = new ParameterizedTypeReference<>(){};
         List<NameCodeDto> response = openApiHelper.connectOpenApi("areaCode1", typeReference, null);
 
         for (NameCodeDto nameCodeDto : response) {
@@ -50,7 +53,6 @@ public class OpenApiService {
     public void saveAreaDetails() {
 
         List<Area> areas = areaRepository.findAll();
-        ParameterizedTypeReference<WrapperDto<NameCodeDto>> typeReference = new ParameterizedTypeReference<>(){};
 
         for (Area area : areas) {
             Map<String, String> addParameter = new HashMap<>();
@@ -72,8 +74,6 @@ public class OpenApiService {
 
     public void saveContentTypes() {
 
-        // OpenAPI 응답 타입 정의
-        ParameterizedTypeReference<WrapperDto<NameCodeDto>> typeReference = new ParameterizedTypeReference<>(){};
         // OpenAPI 호출로 대분류 데이터를 가져옴
         List<NameCodeDto> MajorCats = openApiHelper.connectOpenApi("categoryCode1", typeReference, null);
 
@@ -122,5 +122,28 @@ public class OpenApiService {
 
     public void saveContents() {
 
+        ParameterizedTypeReference<WrapperDto<ContentDto>> contentTypeReference
+                = new ParameterizedTypeReference<>() {};
+        List<ContentDto> response = openApiHelper.connectOpenApi(
+                "areaBasedList1", contentTypeReference, null);
+
+        for (ContentDto contentDto : response) {
+            ContentType contentType = contentTypeRepository.findByCode(contentDto.getCat3());
+            AreaDetail areaDetail = areaDetailRepository.findByAreaCodeAndCode(contentDto.getAreacode(), contentDto.getSigungucode());
+
+            Content content = Content.builder()
+                    .contentType(contentType)
+                    .areaDetail(areaDetail)
+                    .title(contentDto.getTitle())
+                    .mapX(contentDto.getMapx())
+                    .mapY(contentDto.getMapy())
+                    .addr1(contentDto.getAddr1())
+                    .addr2(contentDto.getAddr2())
+                    .tel(contentDto.getTel())
+                    .firstImage(contentDto.getFirstimage())
+                    .firstImage2(contentDto.getFirstimage2())
+                    .build();
+            contentRepository.save(content);
+        }
     }
 }
