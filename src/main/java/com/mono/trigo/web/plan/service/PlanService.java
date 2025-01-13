@@ -2,6 +2,8 @@ package com.mono.trigo.web.plan.service;
 
 import com.mono.trigo.domain.area.entity.AreaDetail;
 import com.mono.trigo.domain.area.repository.AreaDetailRepository;
+import com.mono.trigo.domain.content.entity.Content;
+import com.mono.trigo.domain.content.repository.ContentRepository;
 import com.mono.trigo.domain.like.entity.Like;
 import com.mono.trigo.domain.plan.entity.Plan;
 import com.mono.trigo.domain.user.entity.User;
@@ -16,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -27,17 +30,20 @@ public class PlanService {
     private final PlanRepository planRepository;
     private final LikeRepository likeRepository;
     private final AreaDetailRepository areaDetailRepository;
+    private final ContentRepository contentRepository;
     private final UserHelper userHelper;
 
     public PlanService(
             PlanRepository planRepository,
             LikeRepository likeRepository,
             AreaDetailRepository areaDetailRepository,
+            ContentRepository contentRepository,
             UserHelper userHelper) {
 
         this.planRepository = planRepository;
         this.likeRepository = likeRepository;
         this.areaDetailRepository = areaDetailRepository;
+        this.contentRepository = contentRepository;
         this.userHelper = userHelper;
     }
 
@@ -46,6 +52,15 @@ public class PlanService {
         validateRequest(planRequest);
         User user = userHelper.getCurrentUser();
         AreaDetail areaDetail = areaDetailRepository.getReferenceById(planRequest.getAreaDetailId());
+        List<Content> contents = new ArrayList<>();
+
+        if (!planRequest.getContents().isEmpty()) {
+            for (Long contentId : planRequest.getContents()) {
+                Content content = contentRepository.findById(contentId)
+                                .orElseThrow(() -> new RuntimeException("Content not found"));
+                contents.add(content);
+            }
+        }
 
         Plan plan = Plan.builder()
                 .user(user)
@@ -54,7 +69,7 @@ public class PlanService {
                 .description(planRequest.getDescription())
                 .startDate(planRequest.getStartDate())
                 .endDate(planRequest.getEndDate())
-                .detail(planRequest.getDetail())
+                .contents(contents)
                 .isPublic(false)
                 .build();
 
@@ -76,6 +91,7 @@ public class PlanService {
                         .areaDetail(plan.getAreaDetail())
                         .title(plan.getTitle())
                         .description(plan.getDescription())
+                        .contents(plan.getContents())
                         .startDate(plan.getStartDate())
                         .endDate(plan.getEndDate())
                         .build())
@@ -93,6 +109,7 @@ public class PlanService {
                 .areaDetail(plan.getAreaDetail())
                 .title(plan.getTitle())
                 .description(plan.getDescription())
+                .contents(plan.getContents())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
                 .build();
@@ -106,13 +123,22 @@ public class PlanService {
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
 
         AreaDetail areaDetail = areaDetailRepository.getReferenceById(planRequest.getAreaDetailId());
+        List<Content> contents = new ArrayList<>();
+
+        if (!planRequest.getContents().isEmpty()) {
+            for (Long contentId : planRequest.getContents()) {
+                Content content = contentRepository.findById(contentId)
+                        .orElseThrow(() -> new RuntimeException("Content not found"));
+                contents.add(content);
+            }
+        }
 
         plan.setAreaDetail(areaDetail);
         plan.setTitle(planRequest.getTitle());
         plan.setDescription(planRequest.getDescription());
         plan.setStartDate(planRequest.getStartDate());
         plan.setEndDate(planRequest.getEndDate());
-        plan.setDetail(planRequest.getDetail());
+        plan.setContents(contents);
         planRepository.save(plan);
     }
 
