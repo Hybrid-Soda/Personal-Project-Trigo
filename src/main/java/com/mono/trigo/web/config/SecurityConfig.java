@@ -34,7 +34,6 @@ public class SecurityConfig {
             "/api/v1/users/login",
             "/api/v1/plans",
             "/api/v1/open-api/**",
-            "/api/v1/contents/**"
     };
 
     private final AuthenticationConfiguration authenticationConfiguration;

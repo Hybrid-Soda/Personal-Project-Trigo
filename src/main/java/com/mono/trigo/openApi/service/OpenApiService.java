@@ -131,6 +131,8 @@ public class OpenApiService {
             ContentType contentType = contentTypeRepository.findByCode(contentDto.getCat3());
             AreaDetail areaDetail = areaDetailRepository.findByAreaCodeAndCode(contentDto.getAreacode(), contentDto.getSigungucode());
 
+            if (contentType == null || areaDetail == null) continue;
+
             Content content = Content.builder()
                     .contentType(contentType)
                     .areaDetail(areaDetail)

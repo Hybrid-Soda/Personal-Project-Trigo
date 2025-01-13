@@ -33,6 +33,7 @@ dependencies {
 
 	// dependency of database
 	runtimeOnly 'com.h2database:h2'
+	runtimeOnly 'com.mysql:mysql-connector-j'
 
 	// lombok: Code Creator
 	compileOnly 'org.projectlombok:lombok'
