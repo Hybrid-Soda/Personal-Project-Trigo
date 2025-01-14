@@ -38,7 +38,8 @@ public class ReviewController {
 
     // 리뷰 수정
     @PutMapping("/{reviewId}")
-    public ResponseEntity<String> updateReview(@PathVariable Long reviewId, @RequestBody ReviewRequest reviewRequest) {
+    public ResponseEntity<String> updateReview(
+            @PathVariable Long reviewId, @RequestBody ReviewRequest reviewRequest) {
         reviewService.updateReview(reviewId, reviewRequest);
         return ResponseEntity.status(200).body("Review updated successfully");
     }

@@ -2,6 +2,7 @@ package com.mono.trigo.web.plan.dto;
 
 import com.mono.trigo.domain.area.entity.AreaDetail;
 import com.mono.trigo.domain.content.entity.Content;
+import com.mono.trigo.domain.plan.entity.Plan;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -23,4 +24,16 @@ public class PlanResponse {
     private LocalDate startDate; // YYYY-MM-DD 형식
     private LocalDate endDate;   // YYYY-MM-DD 형식
 
+    public static PlanResponse of(Plan plan) {
+        return builder()
+                .planId(plan.getId())
+                .userId(plan.getUser().getId())
+                .areaDetail(plan.getAreaDetail())
+                .contents(plan.getContents())
+                .title(plan.getTitle())
+                .description(plan.getDescription())
+                .startDate(plan.getStartDate())
+                .endDate(plan.getEndDate())
+                .build();
+    }
 }

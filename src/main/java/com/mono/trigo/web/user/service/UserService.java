@@ -65,13 +65,7 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return UserResponse.builder()
-                .userId(user.getId())
-                .username(user.getUsername())
-                .nickname(user.getNickname())
-                .birthday(user.getBirthday())
-                .gender(user.getGender())
-                .build();
+        return UserResponse.of(user);
     }
 
     public void updateUser(Long userId, UserRequest userRequest) {
@@ -102,13 +96,7 @@ public class UserService {
         List<Review> reviews = reviewRepository.findByUserId(userId);
 
         return reviews.stream()
-                .map(review -> ReviewResponse.builder()
-                        .reviewId(review.getId())
-                        .rating(review.getRating())
-                        .reviewContent(review.getReviewContent())
-                        .pictureList(review.getPictureList())
-                        .reviewUserResponse(new ReviewUserResponse(review.getUser()))
-                        .build())
+                .map(ReviewResponse::of)
                 .collect(Collectors.toList());
     }
 }

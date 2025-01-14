@@ -52,14 +52,7 @@ public class ReviewService {
         List<Review> reviews = reviewRepository.findByContentId(contentId);
 
         return reviews.stream()
-                .map(review -> ReviewResponse.builder()
-                        .reviewId(review.getId())
-                        .contentId(review.getContent().getId())
-                        .rating(review.getRating())
-                        .reviewContent(review.getReviewContent())
-                        .pictureList(review.getPictureList())
-                        .reviewUserResponse(new ReviewUserResponse(review.getUser()))
-                        .build())
+                .map(ReviewResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -68,9 +61,6 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new RuntimeException("Review not found"));
 
-        Content content = contentRepository.getReferenceById(reviewRequest.getContentId());
-
-        review.setContent(content);
         review.setRating(reviewRequest.getRating());
         review.setReviewContent(reviewRequest.getReviewContent());
         review.setPictureList(reviewRequest.getPictureList());

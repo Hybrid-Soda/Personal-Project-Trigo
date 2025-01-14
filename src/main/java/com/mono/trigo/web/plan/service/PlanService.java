@@ -85,16 +85,7 @@ public class PlanService {
         List<Plan> plans = planRepository.findAll();
 
         return plans.stream()
-                .map(plan -> PlanResponse.builder()
-                        .planId(plan.getId())
-                        .userId(plan.getUser().getId())
-                        .areaDetail(plan.getAreaDetail())
-                        .title(plan.getTitle())
-                        .description(plan.getDescription())
-                        .contents(plan.getContents())
-                        .startDate(plan.getStartDate())
-                        .endDate(plan.getEndDate())
-                        .build())
+                .map(PlanResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -103,16 +94,7 @@ public class PlanService {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new RuntimeException("Plan not found"));
 
-        return PlanResponse.builder()
-                .userId(plan.getUser().getId())
-                .planId(plan.getId())
-                .areaDetail(plan.getAreaDetail())
-                .title(plan.getTitle())
-                .description(plan.getDescription())
-                .contents(plan.getContents())
-                .startDate(plan.getStartDate())
-                .endDate(plan.getEndDate())
-                .build();
+        return PlanResponse.of(plan);
     }
 
     public void updatePlan(Long planId, PlanRequest planRequest) {
