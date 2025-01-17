@@ -34,8 +34,8 @@ public class OpenApiHelper {
         String baseUri = "http://apis.data.go.kr/B551011/KorService1/";
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(baseUri + endpoint)
                 .queryParam("serviceKey", serviceKey)
-                .queryParam("numOfRows", 100)
-                .queryParam("pageNo", 1)
+                .queryParam("numOfRows", 200)
+                .queryParam("pageNo", 5)
                 .queryParam("MobileOS", "ETC")
                 .queryParam("MobileApp", "testApp")
                 .queryParam("_type", "json");
