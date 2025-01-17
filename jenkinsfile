@@ -1,0 +1,19 @@
+pipeline {
+    agent any
+    environment {
+
+    }
+    stages {
+        stage('Clone') {
+            steps {
+                git branch: 'develop', credentialsId: 'trigo', url: 'https://github.com/Hybrid-Soda/Personal-Project-Trigo'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh "./gradlew clean build"
+            }
+        }
+    }
+}
