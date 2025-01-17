@@ -6,6 +6,8 @@ import com.mono.trigo.domain.content.entity.ContentType;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
@@ -24,6 +26,8 @@ public class ContentResponse {
     private String tel;
     private String firstImage;
     private String firstImage2;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 
     public static ContentResponse of(Content content) {
         return builder()
@@ -38,6 +42,8 @@ public class ContentResponse {
                 .tel(content.getTel())
                 .firstImage(content.getFirstImage())
                 .firstImage2(content.getFirstImage2())
+                .createdDate(content.getCreatedDate())
+                .modifiedDate(content.getModifiedDate())
                 .build();
     }
 }

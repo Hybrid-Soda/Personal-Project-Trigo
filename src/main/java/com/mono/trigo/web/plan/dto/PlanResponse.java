@@ -6,6 +6,7 @@ import com.mono.trigo.domain.plan.entity.Plan;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -23,6 +24,9 @@ public class PlanResponse {
     private String description; // 일정 설명
     private LocalDate startDate; // YYYY-MM-DD 형식
     private LocalDate endDate;   // YYYY-MM-DD 형식
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
+
 
     public static PlanResponse of(Plan plan) {
         return builder()
@@ -34,6 +38,8 @@ public class PlanResponse {
                 .description(plan.getDescription())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
+                .createdDate(plan.getCreatedDate())
+                .modifiedDate(plan.getModifiedDate())
                 .build();
     }
 }

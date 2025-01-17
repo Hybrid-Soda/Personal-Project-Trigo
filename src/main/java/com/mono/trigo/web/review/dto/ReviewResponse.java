@@ -4,6 +4,8 @@ import com.mono.trigo.domain.review.entity.Review;
 import com.mono.trigo.domain.user.entity.User;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Builder
@@ -17,6 +19,8 @@ public class ReviewResponse {
     private String reviewContent;
     private String pictureList;
     private ReviewUserResponse reviewUserResponse;
+    private LocalDateTime createdDate;
+    private LocalDateTime modifiedDate;
 
     public static ReviewResponse of(Review review) {
         return builder()
@@ -26,6 +30,8 @@ public class ReviewResponse {
                 .reviewContent(review.getReviewContent())
                 .pictureList(review.getPictureList())
                 .reviewUserResponse(ReviewUserResponse.of(review.getUser()))
+                .createdDate(review.getCreatedDate())
+                .modifiedDate(review.getModifiedDate())
                 .build();
     }
 }

@@ -4,11 +4,12 @@ import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.content.repository.ContentRepository;
 import com.mono.trigo.web.content.dto.ContentResponse;
 
+import com.mono.trigo.web.content.dto.ContentSearchCondition;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -20,10 +21,13 @@ public class ContentService {
         this.contentRepository = contentRepository;
     }
 
-    public List<ContentResponse> getContents(Long contentId) {
-        List<ContentResponse> contents = new ArrayList<>();
+    public List<ContentResponse> searchContents(ContentSearchCondition condition) {
 
-        return contents;
+        List<Content> contents = contentRepository.searchContents(condition);
+
+        return contents.stream()
+                .map(ContentResponse::of)
+                .collect(Collectors.toList());
     }
 
     public ContentResponse getContentById(Long contentId) {
