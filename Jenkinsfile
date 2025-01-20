@@ -9,8 +9,10 @@ pipeline {
         LAST_VERSION = "latest"
         BUILD_FILE = "trigo-0.0.1-SNAPSHOT.jar"
     }
+    // sh 작업 경로: ${JENKINS_HOME}/workspace/backend
+    // ssh 작업 경로: /home/ubuntu
+    // 빌드 파일 경로: ${JENKINS_HOME}/workspace/backend/build/libs/*.jar
     stages {
-        // 작업 경로 : ${JENKINS_HOME}/workspace/backend
         stage('Inject Secret') {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
@@ -31,7 +33,6 @@ pipeline {
             }
         }
 
-        // 빌드 파일 경로 : ${JENKINS_HOME}/workspace/backend/build/libs/*.jar = ${UBUNTU_HOME}/workspace/backend/build/libs/*.jar
         stage('Delete Docker Image') {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
@@ -42,15 +43,26 @@ pipeline {
             }
         }
 
-        // 작업 경로 : /home/ubuntu
         stage('Build Docker Image') {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
+                    // Dockerfile 과 JAR 파일을 같은 디렉토리로 복사
                     sh 'cp Dockerfile ${JENKINS_HOME}/Dockerfile'
                     sh 'cp ./build/libs/${BUILD_FILE} ${JENKINS_HOME}/${BUILD_FILE}'
+                    // Dockerfile 불러오기 및 Image 빌드
                     sh '''
                         ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker build -f ${UBUNTU_HOME}/Dockerfile -t ${IMAGE_NAME}:${NEW_VERSION} ."
                     '''
+                }
+            }
+        }
+
+        stage('Deploy'){
+            steps{
+                sshagent (credentials: ['SSH-Credential']){
+                   sh '''
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker compose -f ./spring/docker-compose.yml up -d"
+                   '''
                 }
             }
         }
