@@ -3,7 +3,7 @@ pipeline {
     environment {
         TARGET_HOST = "ubuntu@54.180.104.67"
         IMAGE_NAME = "spring-server"
-        APP_PATH = "./src/main/resources"
+        APP_PATH = "/var/jenkins_home/backend"
         NEW_VERSION = "latest"
         LAST_VERSION = "latest"
     }
@@ -13,7 +13,7 @@ pipeline {
                 sshagent(credentials: ['ssh-credential']) {
                     // 파일 복사 후 경로에 붙여넣기
                     withCredentials([file(credentialsId: 'application-secret', variable: 'SECRET_YML')]) {
-                        sh 'cp $SECRET_YML ${APP_PATH}/application-secret.yml || echo "Copy failed, continuing..."'
+                        sh 'cp $SECRET_YML ${APP_PATH}/src/main/resources/application-secret.yml || echo "Copy failed, continuing..."'
                     }
                 }
             }
@@ -42,7 +42,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker build -t ${IMAGE_NAME}:${NEW_VERSION} ."
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker build -f ${APP_PATH}/Dockerfile -t ${IMAGE_NAME}:${NEW_VERSION} ."
                     '''
                 }
             }
