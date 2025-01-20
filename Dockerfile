@@ -1,8 +1,6 @@
 FROM openjdk:17-jdk-slim
+WORKDIR /home/ubuntu/app
 
-ARG JAR_FILE=trigo-0.0.1-SNAPSHOT.jar
-
-COPY ${JAR_FILE} ./
-COPY application-secret.yml ./
+EXPOSE 8081
 
 ENTRYPOINT ["java", "-jar", "trigo-0.0.1-SNAPSHOT.jar"]
