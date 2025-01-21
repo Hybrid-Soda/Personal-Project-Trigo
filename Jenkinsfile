@@ -18,7 +18,7 @@ pipeline {
                 sshagent(credentials: ['ssh-credential']) {
                     // 파일 복사 후 경로에 붙여넣기
                     withCredentials([file(credentialsId: 'application-secret', variable: 'SECRET_YML')]) {
-                        sh 'cp $SECRET_YML /src/main/resources/application-secret.yml || echo "Copy failed, continuing..."'
+                        sh 'cp $SECRET_YML ${JENKINS_HOME}/workspace/backend/src/main/resources/application-secret.yml || echo "Already"'
                     }
                 }
             }
@@ -51,7 +51,7 @@ pipeline {
                     sh 'cp ./build/libs/${BUILD_FILE} ${JENKINS_HOME}/${BUILD_FILE}'
                     // Dockerfile 불러오기 및 Image 빌드
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker build -f ${UBUNTU_HOME}/Dockerfile -t ${IMAGE_NAME}:${NEW_VERSION} ."
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "cd app/ && docker build -f Dockerfile -t ${IMAGE_NAME}:${NEW_VERSION} ."
                     '''
                 }
             }
@@ -59,7 +59,7 @@ pipeline {
 
         stage('Deploy'){
             steps{
-                sshagent (credentials: ['SSH-Credential']){
+                sshagent (credentials: ['ssh-credential']){
                    sh '''
                         ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker compose -f ./spring/docker-compose.yml up -d"
                    '''

@@ -6,7 +6,7 @@ spring:
     include: secret
 
   datasource:
-    url: jdbc:mysql://54.180.104.67:3306/trigo?allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
+    url: jdbc:mysql://localhost:3306/trigo?allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul
     driver-class-name: com.mysql.cj.jdbc.Driver
     username: root
     password: trigo1234
@@ -24,11 +24,5 @@ spring:
     level:
       org.springframework: DEBUG
 
-#  h2:
-#    console:
-#      enabled: true
-#  datasource:
-#    url: jdbc:h2:mem:testdb
-#    driver-class-name: org.h2.Driver
-#    username: sa
-#    password: ""
+server:
+  port: 8081
