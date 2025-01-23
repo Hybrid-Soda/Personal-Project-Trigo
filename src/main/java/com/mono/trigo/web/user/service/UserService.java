@@ -10,6 +10,7 @@ import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
 import com.mono.trigo.domain.user.repository.UserRepository;
 
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;

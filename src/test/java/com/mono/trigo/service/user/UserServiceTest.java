@@ -31,10 +31,10 @@ class UserServiceTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Test
-    @DisplayName("회원가입 정상 작동 테스트")
-    public void signup_Success() throws Exception {
+    @DisplayName("회원가입이 정상 작동하는지 테스트")
+    void signup_Success() throws Exception {
         // Given
-        SignupRequest signupRequest = SignupRequest.builder()
+        SignupRequest request = SignupRequest.builder()
                 .username("testUser")
                 .password("testPassword")
                 .nickname("testNickname")
@@ -42,21 +42,40 @@ class UserServiceTest {
                 .gender(Gender.MALE)
                 .build();
 
-        when(userRepository.existsByUsername(signupRequest.getUsername())).thenReturn(false);
-        when(bCryptPasswordEncoder.encode(signupRequest.getPassword())).thenReturn("encodedPassword");
+        when(userRepository.existsByUsername(request.getUsername())).thenReturn(false);
+        when(bCryptPasswordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
 
         // When
-        userService.signup(signupRequest);
+        userService.signup(request);
 
         // Then
-        verify(userRepository, times(1)).existsByUsername(signupRequest.getUsername());
-        verify(bCryptPasswordEncoder, times(1)).encode(signupRequest.getPassword());
+        verify(userRepository, times(1)).existsByUsername(request.getUsername());
+        verify(bCryptPasswordEncoder, times(1)).encode(request.getPassword());
         verify(userRepository, times(1)).save(argThat(user ->
-                user.getUsername().equals(signupRequest.getUsername()) &&
-                        user.getPassword().equals("encodedPassword") &&
-                        user.getNickname().equals(signupRequest.getNickname()) &&
-                        user.getBirthday().equals(signupRequest.getBirthday()) &&
-                        user.getGender() == signupRequest.getGender()
+                user.getUsername().equals(request.getUsername()) &&
+                user.getNickname().equals(request.getNickname()) &&
+                user.getBirthday().equals(request.getBirthday()) &&
+                user.getPassword().equals("encodedPassword") &&
+                user.getGender() == request.getGender()
         ));
+    }
+
+    @Test
+    @DisplayName("username 이미 있는 경우 테스트")
+    void signup_shouldThrowException_whenUsernameExists() throws Exception {
+        // Given
+        SignupRequest request = SignupRequest.builder()
+                .username("existingUser")
+                .password("existingPassword")
+                .nickname("existingNickname")
+                .build();
+
+        when(userRepository.existsByUsername(request.getUsername())).thenReturn(true);
+
+        // When
+
+
+        // Then
+
     }
 }
