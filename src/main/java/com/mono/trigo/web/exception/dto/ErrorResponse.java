@@ -1,14 +1,10 @@
 package com.mono.trigo.web.exception.dto;
 
-import lombok.*;
+import com.mono.trigo.web.exception.entity.ApplicationError;
 
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class ErrorResponse {
+public record ErrorResponse(String message) {
 
-    private String errorCode;
-    private String message;
+    public static ErrorResponse of(ApplicationError error) {
+        return new ErrorResponse(error.getMessage());
+    }
 }
