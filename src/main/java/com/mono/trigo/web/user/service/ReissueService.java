@@ -1,6 +1,8 @@
 package com.mono.trigo.web.user.service;
 
 import com.mono.trigo.domain.user.entity.Refresh;
+import com.mono.trigo.web.exception.advice.ApplicationException;
+import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.mono.trigo.web.jwt.JWTUtil;
 import com.mono.trigo.web.user.dto.TokenResponse;
 import com.mono.trigo.domain.user.repository.RefreshRepository;
@@ -44,20 +46,20 @@ public class ReissueService {
     public void validateRefreshToken(String token) {
         // 토큰 유무 확인
         if (token == null) {
-            throw new IllegalArgumentException("refresh token null");
+            throw new ApplicationException(ApplicationError.ACCESS_TOKEN_NOT_FOUND);
         }
 
         // 토큰 만료 여부 확인
         try {
             jwtUtil.isExpired(token);
         } catch (ExpiredJwtException e) {
-            throw new IllegalArgumentException("refresh token expired");
+            throw new ApplicationException(ApplicationError.ACCESS_TOKEN_IS_INVALID);
         }
 
         // 토큰 종류 확인
         String category = jwtUtil.getCategory(token);
         if (!"refresh".equals(category)) {
-            throw new IllegalArgumentException("invalid refresh token");
+            throw new ApplicationException(ApplicationError.ACCESS_TOKEN_IS_INVALID);
         }
     }
 

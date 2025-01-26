@@ -64,7 +64,7 @@ public class UserService {
     public UserResponse getUserById(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApplicationException(ApplicationError.USERID_IS_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException(ApplicationError.USER_IS_NOT_FOUND));
 
         return UserResponse.of(user);
     }
@@ -72,7 +72,7 @@ public class UserService {
     public void updateUser(Long userId, UserRequest userRequest) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ApplicationException(ApplicationError.USERID_IS_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException(ApplicationError.USER_IS_NOT_FOUND));
 
         user.setNickname(userRequest.getNickname());
         user.setBirthday(userRequest.getBirthday());
@@ -83,7 +83,7 @@ public class UserService {
     public void deleteUser(Long userId) {
 
         if (!userRepository.existsById(userId)) {
-            throw new ApplicationException(ApplicationError.USERID_IS_NOT_FOUND);
+            throw new ApplicationException(ApplicationError.USER_IS_NOT_FOUND);
         }
         userRepository.deleteById(userId);
     }
@@ -91,7 +91,7 @@ public class UserService {
     public List<ReviewResponse> getReviewsByUserId(Long userId) {
 
         if (!userRepository.existsById(userId)) {
-            throw new ApplicationException(ApplicationError.USERID_IS_NOT_FOUND);
+            throw new ApplicationException(ApplicationError.USER_IS_NOT_FOUND);
         }
 
         List<Review> reviews = reviewRepository.findByUserId(userId);

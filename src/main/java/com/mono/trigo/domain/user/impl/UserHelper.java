@@ -3,6 +3,8 @@ package com.mono.trigo.domain.user.impl;
 import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.repository.UserRepository;
 
+import com.mono.trigo.web.exception.advice.ApplicationException;
+import com.mono.trigo.web.exception.entity.ApplicationError;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,14 +22,14 @@ public class UserHelper {
 
     public void validateUserExists(Long userId) {
         if (!userRepository.existsById(userId)) {
-            throw new IllegalArgumentException("user is not exist");
+            throw new ApplicationException(ApplicationError.USER_IS_NOT_FOUND);
         }
     }
 
     public UserDetails getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
-            throw new IllegalArgumentException("authentication is not exist");
+            throw new ApplicationException(ApplicationError.AUTHENTICATION_ERROR);
         }
         return (UserDetails) authentication.getPrincipal();
     }
