@@ -11,6 +11,7 @@ import com.mono.trigo.web.user.service.ReissueService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class UserController {
 
     // 회원 가입
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody SignupRequest signupRequest) {
+    public ResponseEntity<String> signup(@Valid @RequestBody SignupRequest signupRequest) {
         userService.signup(signupRequest);
         return ResponseEntity.status(201).body("User created successfully");
     }
@@ -47,7 +48,7 @@ public class UserController {
 
     // 회원 정보 수정
     @PatchMapping("/{userId}")
-    public ResponseEntity<String> updateUser(@PathVariable Long userId, @RequestBody UserRequest userRequest) {
+    public ResponseEntity<String> updateUser(@PathVariable Long userId, @Valid @RequestBody UserRequest userRequest) {
         userService.updateUser(userId, userRequest);
         return ResponseEntity.status(200).body("User updated successfully");
     }

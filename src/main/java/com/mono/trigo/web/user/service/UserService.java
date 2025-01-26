@@ -3,6 +3,8 @@ package com.mono.trigo.web.user.service;
 import com.mono.trigo.domain.review.entity.Review;
 import com.mono.trigo.domain.review.repository.ReviewRepository;
 import com.mono.trigo.domain.user.entity.User;
+import com.mono.trigo.web.exception.advice.ApplicationException;
+import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.review.dto.ReviewUserResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
@@ -44,10 +46,8 @@ public class UserService {
         String password = signupRequest.getPassword();
         String nickname = signupRequest.getNickname();
 
-        Boolean isExistUsername = userRepository.existsByUsername(username);
-
-        if (isExistUsername) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+        if (userRepository.existsByUsername(username)) {
+            throw new ApplicationException(ApplicationError.USERNAME_IS_EXISTED);
         }
 
         User user = User.builder()
@@ -64,7 +64,7 @@ public class UserService {
     public UserResponse getUserById(Long userId) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApplicationException(ApplicationError.USERID_IS_NOT_FOUND));
 
         return UserResponse.of(user);
     }
@@ -72,7 +72,7 @@ public class UserService {
     public void updateUser(Long userId, UserRequest userRequest) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new ApplicationException(ApplicationError.USERID_IS_NOT_FOUND));
 
         user.setNickname(userRequest.getNickname());
         user.setBirthday(userRequest.getBirthday());
@@ -83,7 +83,7 @@ public class UserService {
     public void deleteUser(Long userId) {
 
         if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("User not found");
+            throw new ApplicationException(ApplicationError.USERID_IS_NOT_FOUND);
         }
         userRepository.deleteById(userId);
     }
@@ -91,7 +91,7 @@ public class UserService {
     public List<ReviewResponse> getReviewsByUserId(Long userId) {
 
         if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("User not found");
+            throw new ApplicationException(ApplicationError.USERID_IS_NOT_FOUND);
         }
 
         List<Review> reviews = reviewRepository.findByUserId(userId);
