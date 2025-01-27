@@ -1,12 +1,12 @@
 package com.mono.trigo.web.plan.controller;
 
-import com.mono.trigo.web.plan.service.PlanService;
 import com.mono.trigo.web.plan.dto.PlanRequest;
 import com.mono.trigo.web.plan.dto.PlanResponse;
+import com.mono.trigo.web.plan.service.PlanService;
 import com.mono.trigo.web.plan.dto.CreatePlanResponse;
 
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +26,7 @@ public class PlanController {
 
     // 일정 생성
     @PostMapping
-    public ResponseEntity<CreatePlanResponse> createPlan(@RequestBody PlanRequest planRequest) {
+    public ResponseEntity<CreatePlanResponse> createPlan(@Valid @RequestBody PlanRequest planRequest) {
         CreatePlanResponse response = planService.createPlan(planRequest);
         return ResponseEntity.status(201).body(response);
     }
@@ -47,7 +47,7 @@ public class PlanController {
 
     // 일정 수정
     @PutMapping("/{planId}")
-    public ResponseEntity<String> updatePlan(@PathVariable Long planId, @RequestBody PlanRequest planRequest) {
+    public ResponseEntity<String> updatePlan(@PathVariable Long planId, @Valid @RequestBody PlanRequest planRequest) {
         planService.updatePlan(planId, planRequest);
         return ResponseEntity.status(200).body("Plan updated successfully");
     }

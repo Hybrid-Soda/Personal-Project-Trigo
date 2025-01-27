@@ -1,6 +1,6 @@
 package com.mono.trigo.web.plan.dto;
 
-import com.mono.trigo.domain.content.entity.Content;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -13,11 +13,26 @@ import java.util.List;
 @NoArgsConstructor
 public class PlanRequest {
 
-    private Long areaDetailId; // 지역 ID
-    private List<Long> contents; // 여행지 ID 목록
-    private String title; // 일정 제목
-    private String description; // 일정 설명
-    private LocalDate startDate; // YYYY-MM-DD 형식
-    private LocalDate endDate;   // YYYY-MM-DD 형식
+    @NotNull(message = "지역은 필수 값입니다.")
+    private Long areaDetailId;
 
+    private List<Long> contents;
+
+    @NotBlank(message = "일정 제목은 필수 값입니다.")
+    @Size(min = 2, max = 100, message = "일정 제목은 2자 이상 100자 이하여야 합니다.")
+    private String title;
+
+    @Size(max = 500, message = "500자 이하여야 합니다.")
+    private String description;
+
+    @NotNull(message = "시작 날짜는 필수 값입니다.")
+    @PastOrPresent(message = "시작 날짜는 오늘 이전 날짜여야 합니다.")
+    private LocalDate startDate;
+
+    @NotNull(message = "종료 날짜는 필수 값입니다.")
+    @FutureOrPresent(message = "종료 날짜는 오늘 또는 미래 날짜여야 합니다.")
+    private LocalDate endDate;
+
+    @Builder.Default
+    private Boolean isPublic = false;
 }

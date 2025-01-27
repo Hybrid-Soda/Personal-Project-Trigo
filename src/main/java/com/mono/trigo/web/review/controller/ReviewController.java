@@ -1,10 +1,13 @@
 package com.mono.trigo.web.review.controller;
 
-import com.mono.trigo.web.review.dto.CreateReviewResponse;
 import com.mono.trigo.web.review.dto.ReviewRequest;
 import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.review.service.ReviewService;
+import com.mono.trigo.web.review.dto.CreateReviewResponse;
+
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +27,7 @@ public class ReviewController {
     // 리뷰 생성
     @PostMapping
     public ResponseEntity<CreateReviewResponse> createReview(
-            @PathVariable Long contentId, @RequestBody ReviewRequest reviewRequest) {
+            @PathVariable Long contentId, @Valid @RequestBody ReviewRequest reviewRequest) {
         CreateReviewResponse response = reviewService.createReview(contentId, reviewRequest);
         return ResponseEntity.status(201).body(response);
     }
@@ -39,7 +42,7 @@ public class ReviewController {
     // 리뷰 수정
     @PutMapping("/{reviewId}")
     public ResponseEntity<String> updateReview(
-            @PathVariable Long reviewId, @RequestBody ReviewRequest reviewRequest) {
+            @PathVariable Long reviewId, @Valid @RequestBody ReviewRequest reviewRequest) {
         reviewService.updateReview(reviewId, reviewRequest);
         return ResponseEntity.status(200).body("Review updated successfully");
     }

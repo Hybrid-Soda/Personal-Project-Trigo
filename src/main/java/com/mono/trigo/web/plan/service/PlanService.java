@@ -65,7 +65,7 @@ public class PlanService {
                 .startDate(planRequest.getStartDate())
                 .endDate(planRequest.getEndDate())
                 .contents(contents)
-                .isPublic(false)
+                .isPublic(planRequest.getIsPublic())
                 .build();
 
         Plan savedPlan = planRepository.save(plan);
@@ -121,6 +121,7 @@ public class PlanService {
         plan.setDescription(planRequest.getDescription());
         plan.setStartDate(planRequest.getStartDate());
         plan.setEndDate(planRequest.getEndDate());
+        plan.setIsPublic(planRequest.getIsPublic());
         plan.setContents(contents);
         planRepository.save(plan);
     }

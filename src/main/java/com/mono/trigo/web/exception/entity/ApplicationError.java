@@ -21,8 +21,8 @@ public enum ApplicationError implements ErrorCode {
     ACCESS_TOKEN_IS_INVALID(HttpStatus.UNAUTHORIZED,"액세스 토큰이 유효하지 않습니다.", HttpStatus.UNAUTHORIZED.value()),
 
     // plan
-    CONTENT_IS_NOT_FOUND(HttpStatus.NOT_FOUND, "컨텐츠를 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
     PLAN_IS_NOT_FOUND(HttpStatus.NOT_FOUND, "일정을 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
+    CONTENT_IS_NOT_FOUND(HttpStatus.NOT_FOUND, "컨텐츠를 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
     PLAN_ID_IS_INVALID(HttpStatus.BAD_REQUEST, "일정 아이디가 유효하지 않습니다.", HttpStatus.BAD_REQUEST.value()),
     AREA_DETAIL_IS_NOT_FOUND(HttpStatus.NOT_FOUND, "세부 장소를 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
     ;
