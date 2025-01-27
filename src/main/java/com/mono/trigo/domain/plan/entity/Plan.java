@@ -14,6 +14,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "Plans")
@@ -33,6 +34,7 @@ public class Plan extends BaseEntity {
     private AreaDetail areaDetail;
 
     @OneToMany
+    @Builder.Default
     @JoinColumn(name = "plan_id")
     private List<Content> contents = new ArrayList<>();
 
@@ -48,19 +50,7 @@ public class Plan extends BaseEntity {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
+    @Builder.Default
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic = false;
-
-    @Builder
-    public Plan(User user, AreaDetail areaDetail, String title, String description,
-                LocalDate startDate, LocalDate endDate, List<Content> contents, Boolean isPublic) {
-        this.user = user;
-        this.areaDetail = areaDetail;
-        this.title = title;
-        this.description = description;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.contents = contents;
-        this.isPublic = isPublic != null ? isPublic : false;
-    }
 }
