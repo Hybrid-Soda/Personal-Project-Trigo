@@ -1,5 +1,6 @@
 package com.mono.trigo.web.review.service;
 
+import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.impl.UserHelper;
 import com.mono.trigo.domain.review.entity.Review;
 import com.mono.trigo.domain.content.entity.Content;
@@ -10,31 +11,36 @@ import com.mono.trigo.web.review.dto.ReviewRequest;
 import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.review.dto.CreateReviewResponse;
 
+import com.mono.trigo.web.exception.entity.ApplicationError;
+import com.mono.trigo.web.exception.advice.ApplicationException;
+
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
     private final ContentRepository contentRepository;
     private final UserHelper userHelper;
 
-    public ReviewService(ReviewRepository reviewRepository, ContentRepository contentRepository, UserHelper userHelper) {
-        this.reviewRepository = reviewRepository;
-        this.contentRepository = contentRepository;
-        this.userHelper = userHelper;
-    }
-
     public CreateReviewResponse createReview(Long contentId, ReviewRequest reviewRequest) {
 
-        Content content = contentRepository.getReferenceById(contentId);
+        Content content = contentRepository.findById(contentId)
+                .orElseThrow(() -> new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND));
+
+        User user = userHelper.getCurrentUser();
+        if (user == null) {
+            throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
+        }
 
         Review review = Review.builder()
                 .content(content)
-                .user(userHelper.getCurrentUser())
+                .user(user)
                 .rating(reviewRequest.getRating())
                 .reviewContent(reviewRequest.getReviewContent())
                 .pictureList(reviewRequest.getPictureList())
@@ -48,7 +54,15 @@ public class ReviewService {
     }
 
     public List<ReviewResponse> getReviewByContentId(Long contentId) {
+
+        if (contentId == null || contentId <= 0) {
+            throw new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND);
+        }
+
         List<Review> reviews = reviewRepository.findByContentId(contentId);
+        if (reviews.isEmpty()) {
+            throw new ApplicationException(ApplicationError.REVIEW_IS_NOT_FOUND);
+        }
 
         return reviews.stream()
                 .map(ReviewResponse::of)
@@ -58,7 +72,12 @@ public class ReviewService {
     public void updateReview(Long reviewId, ReviewRequest reviewRequest) {
 
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new RuntimeException("Review not found"));
+                .orElseThrow(() -> new ApplicationException(ApplicationError.REVIEW_IS_NOT_FOUND));
+
+        User currentUser = userHelper.getCurrentUser();
+        if (!review.getUser().equals(currentUser)) {
+            throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
+        }
 
         review.setRating(reviewRequest.getRating());
         review.setReviewContent(reviewRequest.getReviewContent());
@@ -68,9 +87,14 @@ public class ReviewService {
 
     public void deleteReview(Long reviewId) {
 
-        if (!reviewRepository.existsById(reviewId)) {
-            throw new RuntimeException("Plan not found");
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ApplicationException(ApplicationError.REVIEW_IS_NOT_FOUND));
+
+        User currentUser = userHelper.getCurrentUser();
+        if (!review.getUser().equals(currentUser)) {
+            throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
         }
+
         reviewRepository.deleteById(reviewId);
     }
 }
