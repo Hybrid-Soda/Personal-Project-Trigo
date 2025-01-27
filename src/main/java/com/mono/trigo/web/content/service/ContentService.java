@@ -2,9 +2,12 @@ package com.mono.trigo.web.content.service;
 
 import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.content.repository.ContentRepository;
-import com.mono.trigo.web.content.dto.ContentResponse;
 
+import com.mono.trigo.web.content.dto.ContentResponse;
+import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.mono.trigo.web.content.dto.ContentSearchCondition;
+import com.mono.trigo.web.exception.advice.ApplicationException;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +36,7 @@ public class ContentService {
     public ContentResponse getContentById(Long contentId) {
 
         Content content = contentRepository.findById(contentId)
-                .orElseThrow(() -> new RuntimeException("Content is null"));
+                .orElseThrow(() -> new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND));
 
         return ContentResponse.of(content);
     }

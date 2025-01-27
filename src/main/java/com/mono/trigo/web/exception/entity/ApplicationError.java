@@ -9,7 +9,6 @@ public enum ApplicationError implements ErrorCode {
 
     // common
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED,"접근 권한이 없습니다.", HttpStatus.UNAUTHORIZED.value()),
-    INPUT_DATA_IS_INVALID(HttpStatus.BAD_REQUEST, "입력 데이터가 유효하지 않습니다.", HttpStatus.BAD_REQUEST.value()),
     UNRECOGNIZED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "알 수 없는 오류가 발생했습니다.", HttpStatus.INTERNAL_SERVER_ERROR.value()),
 
     // user
