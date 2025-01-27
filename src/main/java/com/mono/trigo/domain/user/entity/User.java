@@ -2,13 +2,16 @@ package com.mono.trigo.domain.user.entity;
 
 import com.mono.trigo.common.audit.BaseEntity;
 
+import com.mono.trigo.web.user.dto.SignupRequest;
 import lombok.*;
 import jakarta.persistence.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "Users")
@@ -34,18 +37,20 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Gender gender;
 
+    @Builder.Default
     @Column(nullable = false, length = 50)
     private String role = "member";
 
-    @Builder
-    public User(String username, String password, String nickname, LocalDate birthday,
-                Gender gender, String role) {
-        this.username = username;
-        this.password = password;
-        this.nickname = nickname;
-        this.birthday = birthday;
-        this.gender = gender;
-        this.role = role != null ? role : "member";
-    }
+    public static User of(SignupRequest signupRequest, String encodedPassword) {
+        String role = signupRequest.getRole();
 
+        return builder()
+                .username(signupRequest.getUsername())
+                .password(encodedPassword)
+                .nickname(signupRequest.getNickname())
+                .birthday(signupRequest.getBirthday())
+                .gender(signupRequest.getGender())
+                .role(role != null ? role : "member")
+                .build();
+    }
 }

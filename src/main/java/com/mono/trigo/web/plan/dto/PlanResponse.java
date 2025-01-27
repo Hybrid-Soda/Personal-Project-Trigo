@@ -27,7 +27,6 @@ public class PlanResponse {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
-
     public static PlanResponse of(Plan plan) {
         return builder()
                 .planId(plan.getId())

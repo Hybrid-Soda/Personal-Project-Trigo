@@ -35,6 +35,10 @@ public class ContentService {
 
     public ContentResponse getContentById(Long contentId) {
 
+        if (contentId == null || contentId <= 0) {
+            throw new ApplicationException(ApplicationError.CONTENT_ID_IS_INVALID);
+        }
+
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND));
 

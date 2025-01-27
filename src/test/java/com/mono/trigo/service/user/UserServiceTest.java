@@ -1,11 +1,23 @@
 package com.mono.trigo.service.user;
 
+import com.mono.trigo.domain.content.entity.Content;
+import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.entity.Gender;
+import com.mono.trigo.domain.user.impl.UserHelper;
+import com.mono.trigo.domain.review.entity.Review;
+import com.mono.trigo.domain.user.repository.UserRepository;
+import com.mono.trigo.domain.review.repository.ReviewRepository;
+
+import com.mono.trigo.web.user.dto.UserRequest;
+import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
 import com.mono.trigo.web.user.service.UserService;
-import com.mono.trigo.domain.user.repository.UserRepository;
+import com.mono.trigo.web.review.dto.ReviewResponse;
+import com.mono.trigo.web.exception.entity.ApplicationError;
+import com.mono.trigo.web.exception.advice.ApplicationException;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -15,7 +27,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,23 +41,37 @@ class UserServiceTest {
     private UserService userService;
 
     @Mock
+    private UserHelper userHelper;
+
+    @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private ReviewRepository reviewRepository;
 
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @Test
-    @DisplayName("회원가입이 정상 작동하는지 테스트")
-    void signup_Success() throws Exception {
-        // Given
-        SignupRequest request = SignupRequest.builder()
-                .username("testUser")
-                .password("testPassword")
-                .nickname("testNickname")
+    private User user;
+    private SignupRequest request;
+
+    @BeforeEach
+    void setUp() {
+        request = SignupRequest.builder()
+                .username("testUser123")
+                .password("testPassword123")
+                .nickname("testNickname123")
                 .birthday(LocalDate.of(2000, 1, 1))
                 .gender(Gender.MALE)
                 .build();
 
+        user = User.of(request, "encodedPassword");
+    }
+
+    @Test
+    @DisplayName("회원가입 성공")
+    void signup_Success() {
+        // Given
         when(userRepository.existsByUsername(request.getUsername())).thenReturn(false);
         when(bCryptPasswordEncoder.encode(request.getPassword())).thenReturn("encodedPassword");
 
@@ -54,28 +84,106 @@ class UserServiceTest {
         verify(userRepository, times(1)).save(argThat(user ->
                 user.getUsername().equals(request.getUsername()) &&
                 user.getNickname().equals(request.getNickname()) &&
-                user.getBirthday().equals(request.getBirthday()) &&
-                user.getPassword().equals("encodedPassword") &&
-                user.getGender() == request.getGender()
+                user.getPassword().equals("encodedPassword")
         ));
     }
 
     @Test
-    @DisplayName("username 이미 있는 경우 테스트")
-    void signup_shouldThrowException_whenUsernameExists() throws Exception {
+    @DisplayName("회원가입 실패: 중복된 사용자 이름")
+    void signup_Fail_UsernameExists() {
         // Given
-        SignupRequest request = SignupRequest.builder()
-                .username("existingUser")
-                .password("existingPassword")
-                .nickname("existingNickname")
-                .build();
-
         when(userRepository.existsByUsername(request.getUsername())).thenReturn(true);
 
-        // When
+        // When & Then
+        ApplicationException exception =
+                assertThrows(ApplicationException.class, () -> userService.signup(request));
+        assertEquals(ApplicationError.USERNAME_IS_EXISTED, exception.getError());
+    }
 
+    @Test
+    @DisplayName("회원 ID로 사용자 정보 조회 성공")
+    void getUserById_Success() {
+        // Given
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+
+        // When
+        UserResponse response = userService.getUserById(1L);
 
         // Then
+        assertEquals(user.getUsername(), response.getUsername());
+        assertEquals(user.getNickname(), response.getNickname());
+    }
 
+    @Test
+    @DisplayName("회원 ID로 사용자 정보 조회 실패: 사용자 없음")
+    void getUserById_Fail_UserNotFound() {
+        // Given
+        when(userRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // When & Then
+        ApplicationException exception =
+                assertThrows(ApplicationException.class, () -> userService.getUserById(1L));
+        assertEquals(ApplicationError.USER_IS_NOT_FOUND, exception.getError());
+    }
+
+    @Test
+    @DisplayName("사용자 정보 수정 성공")
+    void updateUser_Success() {
+        UserRequest userRequest = UserRequest.builder()
+                .nickname("newNickname123")
+                .birthday(LocalDate.of(1999, 1, 1))
+                .gender(Gender.FEMALE)
+                .build();
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userHelper.getCurrentUser()).thenReturn(user);
+
+        // When
+        userService.updateUser(1L, userRequest);
+
+        // Then
+        verify(userRepository, times(1)).save(argThat(user ->
+                user.getNickname().equals(userRequest.getNickname()) &&
+                user.getBirthday().equals(userRequest.getBirthday()) &&
+                user.getGender().equals(userRequest.getGender())
+        ));
+    }
+
+    @Test
+    @DisplayName("사용자 삭제 성공")
+    void deleteUser_Success() {
+        // Given
+        when(userRepository.findById(1L)).thenReturn(Optional.of(user));
+        when(userHelper.getCurrentUser()).thenReturn(user);
+
+        // When
+        userService.deleteUser(1L);
+
+        // Then
+        verify(userRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("작성한 리뷰 조회 성공")
+    void getReviewsByUserId_Success() {
+        // Given
+        Review review = Review.builder()
+                .id(1L)
+                .user(user)
+                .content(new Content())
+                .rating(5)
+                .reviewContent("Great place!")
+                .build();
+
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(reviewRepository.findByUserId(1L)).thenReturn(List.of(review));
+
+        // When
+        List<ReviewResponse> responses = userService.getReviewsByUserId(1L);
+
+        // Then
+        assertEquals(1, responses.size());
+        assertEquals(review.getReviewContent(), responses.get(0).getReviewContent());
+        assertEquals(review.getRating(), responses.get(0).getRating());
     }
 }

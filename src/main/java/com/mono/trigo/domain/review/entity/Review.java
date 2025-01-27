@@ -9,6 +9,7 @@ import jakarta.persistence.*;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "Reviews")
@@ -36,15 +37,4 @@ public class Review extends BaseEntity {
     @Lob
     @Column(name = "picture_list")
     private String pictureList;
-
-    @Builder
-    public Review(Content content, User user, Integer rating,
-                  String reviewContent, String pictureList) {
-
-        this.content = content;
-        this.user = user;
-        this.rating = rating;
-        this.reviewContent = reviewContent;
-        this.pictureList = pictureList;
-    }
 }

@@ -36,21 +36,15 @@ public class UserService {
 
     public void signup(SignupRequest signupRequest) {
 
-        String username = signupRequest.getUsername();
-        String password = signupRequest.getPassword();
-        String nickname = signupRequest.getNickname();
-
-        if (userRepository.existsByUsername(username)) {
+        if (userRepository.existsByUsername(signupRequest.getUsername())) {
             throw new ApplicationException(ApplicationError.USERNAME_IS_EXISTED);
         }
 
-        User user = User.builder()
-                .username(username)
-                .password(bCryptPasswordEncoder.encode(password))
-                .nickname(nickname)
-                .birthday(signupRequest.getBirthday())
-                .gender(signupRequest.getGender())
-                .build();
+        if (userRepository.existsByNickname(signupRequest.getNickname())) {
+            throw new ApplicationException(ApplicationError.NICKNAME_IS_EXISTED);
+        }
+
+        User user = User.of(signupRequest, bCryptPasswordEncoder.encode(signupRequest.getPassword()));
 
         userRepository.save(user);
     }
@@ -80,9 +74,13 @@ public class UserService {
 
     public void deleteUser(Long userId) {
 
-        if (!userRepository.existsById(userId)) {
-            throw new ApplicationException(ApplicationError.USER_IS_NOT_FOUND);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ApplicationException(ApplicationError.USER_IS_NOT_FOUND));
+
+        if (!user.equals(userHelper.getCurrentUser())) {
+            throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
         }
+
         userRepository.deleteById(userId);
     }
 

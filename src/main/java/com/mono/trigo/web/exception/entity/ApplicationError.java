@@ -14,6 +14,7 @@ public enum ApplicationError implements ErrorCode {
     // user
     USER_IS_NOT_FOUND(HttpStatus.NOT_FOUND, "유저를 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
     USERNAME_IS_EXISTED(HttpStatus.CONFLICT, "해당 아이디를 사용할 수 없습니다.", HttpStatus.CONFLICT.value()),
+    NICKNAME_IS_EXISTED(HttpStatus.CONFLICT, "해당 닉네임을 사용할 수 없습니다.", HttpStatus.CONFLICT.value()),
 
     // auth
     ACCESS_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED,"액세스 토큰을 찾을 수 없습니다.", HttpStatus.UNAUTHORIZED.value()),

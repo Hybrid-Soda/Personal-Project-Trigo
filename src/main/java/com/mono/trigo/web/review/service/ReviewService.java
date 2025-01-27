@@ -71,6 +71,10 @@ public class ReviewService {
 
     public void updateReview(Long reviewId, ReviewRequest reviewRequest) {
 
+        if (reviewId == null || reviewId <= 0) {
+            throw new ApplicationException(ApplicationError.REVIEW_ID_IS_INVALID);
+        }
+
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.REVIEW_IS_NOT_FOUND));
 

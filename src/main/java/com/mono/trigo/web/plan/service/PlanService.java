@@ -47,10 +47,6 @@ public class PlanService {
         AreaDetail areaDetail = areaDetailRepository.findById(planRequest.getAreaDetailId())
                 .orElseThrow(() -> new ApplicationException(ApplicationError.AREA_DETAIL_IS_NOT_FOUND));
 
-        if (planRequest.getContents() == null || planRequest.getContents().isEmpty()) {
-            throw new ApplicationException(ApplicationError.INPUT_DATA_IS_INVALID);
-        }
-
         List<Content> contents = planRequest.getContents().stream()
                 .distinct()
                 .map(contentId -> contentRepository.findById(contentId)
@@ -97,6 +93,10 @@ public class PlanService {
     }
 
     public void updatePlan(Long planId, PlanRequest planRequest) {
+
+        if (planId == null || planId <= 0) {
+            throw new ApplicationException(ApplicationError.PLAN_ID_IS_INVALID);
+        }
 
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.PLAN_IS_NOT_FOUND));
