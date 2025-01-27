@@ -1,66 +1,61 @@
 package com.mono.trigo.web.plan.service;
 
-import com.mono.trigo.domain.area.entity.AreaDetail;
-import com.mono.trigo.domain.area.repository.AreaDetailRepository;
-import com.mono.trigo.domain.content.entity.Content;
-import com.mono.trigo.domain.content.repository.ContentRepository;
 import com.mono.trigo.domain.like.entity.Like;
-import com.mono.trigo.domain.plan.entity.Plan;
-import com.mono.trigo.domain.user.entity.User;
-import com.mono.trigo.web.plan.dto.PlanRequest;
-import com.mono.trigo.web.plan.dto.PlanResponse;
-import com.mono.trigo.domain.user.impl.UserHelper;
-import com.mono.trigo.web.plan.dto.CreatePlanResponse;
-import com.mono.trigo.domain.plan.repository.PlanRepository;
 import com.mono.trigo.domain.like.repository.LikeRepository;
 
+import com.mono.trigo.domain.plan.entity.Plan;
+import com.mono.trigo.domain.plan.repository.PlanRepository;
+
+import com.mono.trigo.domain.user.entity.User;
+import com.mono.trigo.domain.user.impl.UserHelper;
+import com.mono.trigo.domain.area.entity.AreaDetail;
+import com.mono.trigo.domain.area.repository.AreaDetailRepository;
+
+import com.mono.trigo.domain.content.entity.Content;
+import com.mono.trigo.domain.content.repository.ContentRepository;
+
+import com.mono.trigo.web.plan.dto.PlanRequest;
+import com.mono.trigo.web.plan.dto.PlanResponse;
+import com.mono.trigo.web.plan.dto.CreatePlanResponse;
+
+import com.mono.trigo.web.exception.entity.ApplicationError;
+import com.mono.trigo.web.exception.advice.ApplicationException;
+
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class PlanService {
 
+    private final UserHelper userHelper;
     private final PlanRepository planRepository;
     private final LikeRepository likeRepository;
-    private final AreaDetailRepository areaDetailRepository;
     private final ContentRepository contentRepository;
-    private final UserHelper userHelper;
-
-    public PlanService(
-            PlanRepository planRepository,
-            LikeRepository likeRepository,
-            AreaDetailRepository areaDetailRepository,
-            ContentRepository contentRepository,
-            UserHelper userHelper) {
-
-        this.planRepository = planRepository;
-        this.likeRepository = likeRepository;
-        this.areaDetailRepository = areaDetailRepository;
-        this.contentRepository = contentRepository;
-        this.userHelper = userHelper;
-    }
+    private final AreaDetailRepository areaDetailRepository;
 
     public CreatePlanResponse createPlan(PlanRequest planRequest) {
 
-        validateRequest(planRequest);
         User user = userHelper.getCurrentUser();
-        AreaDetail areaDetail = areaDetailRepository.getReferenceById(planRequest.getAreaDetailId());
-        List<Content> contents = new ArrayList<>();
+        AreaDetail areaDetail = areaDetailRepository.findById(planRequest.getAreaDetailId())
+                .orElseThrow(() -> new ApplicationException(ApplicationError.AREA_DETAIL_IS_NOT_FOUND));
 
-        if (!planRequest.getContents().isEmpty()) {
-            for (Long contentId : planRequest.getContents()) {
-                Content content = contentRepository.findById(contentId)
-                                .orElseThrow(() -> new RuntimeException("Content not found"));
-                contents.add(content);
-            }
+        if (planRequest.getContents() == null || planRequest.getContents().isEmpty()) {
+            throw new ApplicationException(ApplicationError.INPUT_DATA_IS_INVALID);
         }
+
+        List<Content> contents = planRequest.getContents().stream()
+                .distinct()
+                .map(contentId -> contentRepository.findById(contentId)
+                        .orElseThrow(() -> new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND)))
+                .collect(Collectors.toList());
 
         Plan plan = Plan.builder()
                 .user(user)
@@ -91,18 +86,24 @@ public class PlanService {
 
     public PlanResponse getPlanById(Long planId) {
 
+        if (planId == null || planId <= 0) {
+            throw new ApplicationException(ApplicationError.PLAN_ID_IS_INVALID);
+        }
+
         Plan plan = planRepository.findById(planId)
-                .orElseThrow(() -> new RuntimeException("Plan not found"));
+                .orElseThrow(() -> new ApplicationException(ApplicationError.PLAN_IS_NOT_FOUND));
 
         return PlanResponse.of(plan);
     }
 
     public void updatePlan(Long planId, PlanRequest planRequest) {
 
-        validateRequest(planRequest);
-
         Plan plan = planRepository.findById(planId)
-                .orElseThrow(() -> new RuntimeException("Plan not found"));
+                .orElseThrow(() -> new ApplicationException(ApplicationError.PLAN_IS_NOT_FOUND));
+
+        if (!plan.getUser().equals(userHelper.getCurrentUser())) {
+            throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
+        }
 
         AreaDetail areaDetail = areaDetailRepository.getReferenceById(planRequest.getAreaDetailId());
         List<Content> contents = new ArrayList<>();
@@ -110,7 +111,7 @@ public class PlanService {
         if (!planRequest.getContents().isEmpty()) {
             for (Long contentId : planRequest.getContents()) {
                 Content content = contentRepository.findById(contentId)
-                        .orElseThrow(() -> new RuntimeException("Content not found"));
+                        .orElseThrow(() -> new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND));
                 contents.add(content);
             }
         }
@@ -126,9 +127,13 @@ public class PlanService {
 
     public void deletePlan(Long planId) {
 
-        if (!planRepository.existsById(planId)) {
-            throw new RuntimeException("Plan not found");
+        Plan plan = planRepository.findById(planId)
+                .orElseThrow(() -> new ApplicationException(ApplicationError.PLAN_IS_NOT_FOUND));
+
+        if (!plan.getUser().equals(userHelper.getCurrentUser())) {
+            throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
         }
+
         planRepository.deleteById(planId);
     }
 
@@ -136,7 +141,7 @@ public class PlanService {
 
         User user = userHelper.getCurrentUser();
         Plan plan = planRepository.findById(planId)
-                .orElseThrow(() -> new RuntimeException("Plan not found"));
+                .orElseThrow(() -> new ApplicationException(ApplicationError.PLAN_IS_NOT_FOUND));
 
         Like like = Like.builder()
                 .user(user)
@@ -151,28 +156,8 @@ public class PlanService {
 
         User user = userHelper.getCurrentUser();
         Plan plan = planRepository.findById(planId)
-                .orElseThrow(() -> new RuntimeException("Plan not found"));
+                .orElseThrow(() -> new ApplicationException(ApplicationError.PLAN_IS_NOT_FOUND));
 
         likeRepository.deleteByUserAndPlan(user, plan);
     }
-
-    private void validateRequest(PlanRequest planRequest) {
-
-        if (planRequest.getTitle() == null || planRequest.getTitle().isEmpty()) {
-            throw new IllegalArgumentException("Title is required.");
-        }
-        if (planRequest.getDescription() == null || planRequest.getDescription().isEmpty()) {
-            throw new IllegalArgumentException("Description is required.");
-        }
-        if (planRequest.getStartDate() == null) {
-            throw new IllegalArgumentException("Start date is required.");
-        }
-        if (planRequest.getEndDate() == null) {
-            throw new IllegalArgumentException("End date is required.");
-        }
-        if (planRequest.getStartDate().isAfter(planRequest.getEndDate())) {
-            throw new IllegalArgumentException("Start date must be before end date.");
-        }
-    }
-
 }

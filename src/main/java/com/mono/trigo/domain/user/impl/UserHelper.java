@@ -29,7 +29,7 @@ public class UserHelper {
     public UserDetails getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null) {
-            throw new ApplicationException(ApplicationError.AUTHENTICATION_ERROR);
+            throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
         }
         return (UserDetails) authentication.getPrincipal();
     }

@@ -1,21 +1,22 @@
 package com.mono.trigo.web.user.service;
 
+import com.mono.trigo.domain.user.entity.User;
+import com.mono.trigo.domain.user.impl.UserHelper;
+import com.mono.trigo.domain.user.repository.UserRepository;
+
 import com.mono.trigo.domain.review.entity.Review;
 import com.mono.trigo.domain.review.repository.ReviewRepository;
-import com.mono.trigo.domain.user.entity.User;
-import com.mono.trigo.web.exception.advice.ApplicationException;
+
 import com.mono.trigo.web.exception.entity.ApplicationError;
-import com.mono.trigo.web.review.dto.ReviewResponse;
-import com.mono.trigo.web.review.dto.ReviewUserResponse;
+import com.mono.trigo.web.exception.advice.ApplicationException;
+
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
-import com.mono.trigo.domain.user.repository.UserRepository;
+import com.mono.trigo.web.review.dto.ReviewResponse;
 
-import lombok.NoArgsConstructor;
-import org.springframework.http.HttpStatus;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import lombok.extern.slf4j.Slf4j;
@@ -25,20 +26,13 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class UserService {
 
+    private final UserHelper userHelper;
     private final UserRepository userRepository;
     private final ReviewRepository reviewRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    public UserService(
-            UserRepository userRepository,
-            ReviewRepository reviewRepository,
-            BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userRepository = userRepository;
-        this.reviewRepository = reviewRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-    }
 
     public void signup(SignupRequest signupRequest) {
 
@@ -73,6 +67,10 @@ public class UserService {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.USER_IS_NOT_FOUND));
+
+        if (!user.equals(userHelper.getCurrentUser())) {
+            throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
+        }
 
         user.setNickname(userRequest.getNickname());
         user.setBirthday(userRequest.getBirthday());
