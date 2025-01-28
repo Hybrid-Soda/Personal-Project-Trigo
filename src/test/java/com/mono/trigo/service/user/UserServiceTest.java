@@ -115,7 +115,7 @@ class UserServiceTest {
     }
 
     @Test
-    @DisplayName("회원 ID로 사용자 정보 조회 실패: 사용자 없음")
+    @DisplayName("회원 ID로 사용자 정보 조회 실패: 존재하지 않는 사용자")
     void getUserById_Fail_UserNotFound() {
         // Given
         when(userRepository.findById(1L)).thenReturn(Optional.empty());

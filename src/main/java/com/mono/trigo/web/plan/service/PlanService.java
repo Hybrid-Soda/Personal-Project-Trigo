@@ -2,27 +2,24 @@ package com.mono.trigo.web.plan.service;
 
 import com.mono.trigo.domain.like.entity.Like;
 import com.mono.trigo.domain.like.repository.LikeRepository;
-
 import com.mono.trigo.domain.plan.entity.Plan;
 import com.mono.trigo.domain.plan.repository.PlanRepository;
-
 import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.impl.UserHelper;
 import com.mono.trigo.domain.area.entity.AreaDetail;
 import com.mono.trigo.domain.area.repository.AreaDetailRepository;
-
 import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.content.repository.ContentRepository;
 
 import com.mono.trigo.web.plan.dto.PlanRequest;
 import com.mono.trigo.web.plan.dto.PlanResponse;
 import com.mono.trigo.web.plan.dto.CreatePlanResponse;
-
 import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.mono.trigo.web.exception.advice.ApplicationException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -88,11 +85,13 @@ public class PlanService {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.PLAN_IS_NOT_FOUND));
 
+        AreaDetail areaDetail = areaDetailRepository.findById(planRequest.getAreaDetailId())
+                .orElseThrow(() -> new ApplicationException(ApplicationError.AREA_DETAIL_IS_NOT_FOUND));
+
         if (!plan.getUser().equals(userHelper.getCurrentUser())) {
             throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
         }
 
-        AreaDetail areaDetail = areaDetailRepository.getReferenceById(planRequest.getAreaDetailId());
         List<Content> contents = new ArrayList<>();
 
         if (!planRequest.getContents().isEmpty()) {
@@ -130,12 +129,11 @@ public class PlanService {
         User user = userHelper.getCurrentUser();
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.PLAN_IS_NOT_FOUND));
-
         Like like = Like.of(user, plan);
 
         try {
             likeRepository.save(like);
-        } catch (Exception e) {
+        } catch (DataIntegrityViolationException e) {
             throw new ApplicationException(ApplicationError.LIKE_IS_EXISTED);
         }
     }
