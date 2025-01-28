@@ -38,7 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
-public class PlanServiceTest {
+class PlanServiceTest {
 
     @InjectMocks
     private PlanService planService;
@@ -202,8 +202,8 @@ public class PlanServiceTest {
     @DisplayName("일정 삭제 성공")
     void deletePlan_Success() {
         // Given
-        when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
         when(userHelper.getCurrentUser()).thenReturn(user);
+        when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
 
         // When
         planService.deletePlan(1L);

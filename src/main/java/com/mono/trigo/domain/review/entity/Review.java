@@ -1,9 +1,10 @@
 package com.mono.trigo.domain.review.entity;
 
+import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.common.audit.BaseEntity;
 import com.mono.trigo.domain.content.entity.Content;
-import com.mono.trigo.domain.user.entity.User;
 
+import com.mono.trigo.web.review.dto.ReviewRequest;
 import lombok.*;
 import jakarta.persistence.*;
 
@@ -37,4 +38,14 @@ public class Review extends BaseEntity {
     @Lob
     @Column(name = "picture_list")
     private String pictureList;
+
+    public static Review of(ReviewRequest reviewRequest, Content content, User user) {
+        return builder()
+                .content(content)
+                .user(user)
+                .rating(reviewRequest.getRating())
+                .reviewContent(reviewRequest.getReviewContent())
+                .pictureList(reviewRequest.getPictureList())
+                .build();
+    }
 }

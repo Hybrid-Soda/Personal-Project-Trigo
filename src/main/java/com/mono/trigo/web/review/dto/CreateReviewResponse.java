@@ -10,4 +10,10 @@ import lombok.Setter;
 public class CreateReviewResponse {
 
     private Long reviewId;
+
+    public static CreateReviewResponse of(Long reviewId) {
+        return builder()
+                .reviewId(reviewId)
+                .build();
+    }
 }

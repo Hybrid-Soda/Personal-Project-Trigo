@@ -38,19 +38,10 @@ public class ReviewService {
             throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
         }
 
-        Review review = Review.builder()
-                .content(content)
-                .user(user)
-                .rating(reviewRequest.getRating())
-                .reviewContent(reviewRequest.getReviewContent())
-                .pictureList(reviewRequest.getPictureList())
-                .build();
-
+        Review review = Review.of(reviewRequest, content, user);
         Review savedReview = reviewRepository.save(review);
 
-        return CreateReviewResponse.builder()
-                .reviewId(savedReview.getId())
-                .build();
+        return CreateReviewResponse.of(savedReview.getId());
     }
 
     public List<ReviewResponse> getReviewByContentId(Long contentId) {
@@ -60,9 +51,6 @@ public class ReviewService {
         }
 
         List<Review> reviews = reviewRepository.findByContentId(contentId);
-        if (reviews.isEmpty()) {
-            throw new ApplicationException(ApplicationError.REVIEW_IS_NOT_FOUND);
-        }
 
         return reviews.stream()
                 .map(ReviewResponse::of)
