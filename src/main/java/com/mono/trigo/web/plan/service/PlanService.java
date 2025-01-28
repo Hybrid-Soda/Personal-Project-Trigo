@@ -133,7 +133,7 @@ public class PlanService {
 
         try {
             likeRepository.save(like);
-        } catch (DataIntegrityViolationException e) {
+        } catch (Exception e) {
             throw new ApplicationException(ApplicationError.LIKE_IS_EXISTED);
         }
     }
