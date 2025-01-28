@@ -2,15 +2,17 @@ package com.mono.trigo.domain.plan.entity;
 
 import com.mono.trigo.common.audit.BaseEntity;
 
+import com.mono.trigo.web.plan.dto.PlanRequest;
+import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.area.entity.AreaDetail;
 import com.mono.trigo.domain.content.entity.Content;
-import com.mono.trigo.domain.user.entity.User;
+
 import lombok.*;
 import jakarta.persistence.*;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -53,4 +55,17 @@ public class Plan extends BaseEntity {
     @Builder.Default
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic = false;
+
+    public static Plan of(PlanRequest planRequest, User user, AreaDetail areaDetail, List<Content> contents) {
+        return builder()
+                .user(user)
+                .areaDetail(areaDetail)
+                .contents(contents)
+                .title(planRequest.getTitle())
+                .description(planRequest.getDescription())
+                .startDate(planRequest.getStartDate())
+                .endDate(planRequest.getEndDate())
+                .isPublic(planRequest.getIsPublic())
+                .build();
+    }
 }

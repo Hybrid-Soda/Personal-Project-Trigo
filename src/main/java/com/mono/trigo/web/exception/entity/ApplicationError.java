@@ -23,6 +23,7 @@ public enum ApplicationError implements ErrorCode {
     // plan
     PLAN_IS_NOT_FOUND(HttpStatus.NOT_FOUND, "일정을 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
     PLAN_ID_IS_INVALID(HttpStatus.BAD_REQUEST, "일정 아이디가 유효하지 않습니다.", HttpStatus.BAD_REQUEST.value()),
+    LIKE_IS_EXISTED(HttpStatus.CONFLICT, "이미 좋아요 되어있습니다.", HttpStatus.CONFLICT.value()),
 
     // review
     REVIEW_IS_NOT_FOUND(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),

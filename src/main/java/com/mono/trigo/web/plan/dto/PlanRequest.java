@@ -26,11 +26,9 @@ public class PlanRequest {
     private String description;
 
     @NotNull(message = "시작 날짜는 필수 값입니다.")
-    @PastOrPresent(message = "시작 날짜는 오늘 이전 날짜여야 합니다.")
     private LocalDate startDate;
 
     @NotNull(message = "종료 날짜는 필수 값입니다.")
-    @FutureOrPresent(message = "종료 날짜는 오늘 또는 미래 날짜여야 합니다.")
     private LocalDate endDate;
 
     @Builder.Default

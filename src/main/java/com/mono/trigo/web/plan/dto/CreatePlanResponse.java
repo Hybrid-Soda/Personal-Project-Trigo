@@ -9,4 +9,9 @@ public class CreatePlanResponse {
 
     private Long planId;
 
+    public static CreatePlanResponse of(Long planId) {
+        return builder()
+                .planId(planId)
+                .build();
+    }
 }

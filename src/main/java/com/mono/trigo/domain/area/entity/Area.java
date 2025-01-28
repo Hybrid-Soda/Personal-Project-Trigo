@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity(name = "Areas")
 public class Area {
 
@@ -19,10 +21,4 @@ public class Area {
 
     @Column(nullable = false)
     private String code;
-
-    @Builder
-    public Area(String name, String code) {
-        this.name = name;
-        this.code = code;
-    }
 }

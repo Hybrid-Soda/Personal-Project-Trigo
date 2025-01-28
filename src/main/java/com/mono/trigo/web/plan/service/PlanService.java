@@ -51,22 +51,11 @@ public class PlanService {
                         .orElseThrow(() -> new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND)))
                 .collect(Collectors.toList());
 
-        Plan plan = Plan.builder()
-                .user(user)
-                .areaDetail(areaDetail)
-                .title(planRequest.getTitle())
-                .description(planRequest.getDescription())
-                .startDate(planRequest.getStartDate())
-                .endDate(planRequest.getEndDate())
-                .contents(contents)
-                .isPublic(planRequest.getIsPublic())
-                .build();
+        Plan plan = Plan.of(planRequest, user, areaDetail, contents);
 
         Plan savedPlan = planRepository.save(plan);
 
-        return CreatePlanResponse.builder()
-                .planId(savedPlan.getId())
-                .build();
+        return CreatePlanResponse.of(savedPlan.getId());
     }
 
     public List<PlanResponse> getAllPlans() {
@@ -142,12 +131,13 @@ public class PlanService {
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.PLAN_IS_NOT_FOUND));
 
-        Like like = Like.builder()
-                .user(user)
-                .plan(plan)
-                .build();
+        Like like = Like.of(user, plan);
 
-        likeRepository.save(like);
+        try {
+            likeRepository.save(like);
+        } catch (Exception e) {
+            throw new ApplicationException(ApplicationError.LIKE_IS_EXISTED);
+        }
     }
 
     @Transactional

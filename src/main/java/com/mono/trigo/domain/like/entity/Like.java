@@ -4,12 +4,16 @@ import com.mono.trigo.common.audit.BaseEntity;
 import com.mono.trigo.domain.plan.entity.Plan;
 import com.mono.trigo.domain.user.entity.User;
 
+import jakarta.annotation.Nullable;
 import lombok.*;
 import jakarta.persistence.*;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "likes", uniqueConstraints = @UniqueConstraint(
         name = "like_uid", columnNames = {"user_id", "plan_id"}))
 public class Like extends BaseEntity {
@@ -27,12 +31,10 @@ public class Like extends BaseEntity {
     @JoinColumn(name = "plan_id", nullable = false)
     private Plan plan;
 
-    @Builder
-    public Like(User user, Plan plan) {
-        this.user = user;
-        this.plan = plan;
-    }
-
-    public Like() {
+    public static Like of(User user, Plan plan) {
+        return builder()
+                .user(user)
+                .plan(plan)
+                .build();
     }
 }

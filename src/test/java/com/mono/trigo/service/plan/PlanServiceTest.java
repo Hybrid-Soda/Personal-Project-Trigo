@@ -1,18 +1,19 @@
 package com.mono.trigo.service.plan;
 
-import com.mono.trigo.domain.content.entity.Content;
+import com.mono.trigo.domain.area.entity.Area;
 import com.mono.trigo.domain.plan.entity.Plan;
 import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.impl.UserHelper;
 import com.mono.trigo.domain.area.entity.AreaDetail;
+import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.plan.repository.PlanRepository;
 import com.mono.trigo.domain.like.repository.LikeRepository;
 import com.mono.trigo.domain.content.repository.ContentRepository;
 import com.mono.trigo.domain.area.repository.AreaDetailRepository;
 
-import com.mono.trigo.web.plan.dto.CreatePlanResponse;
 import com.mono.trigo.web.plan.dto.PlanRequest;
 import com.mono.trigo.web.plan.service.PlanService;
+import com.mono.trigo.web.plan.dto.CreatePlanResponse;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,12 +25,11 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.time.LocalDate;
 import java.util.Optional;
+import java.time.LocalDate;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 public class PlanServiceTest {
@@ -52,23 +52,17 @@ public class PlanServiceTest {
     @Mock
     private AreaDetailRepository areaDetailRepository;
 
+    private final User user = User.builder().id(1L).username("testUser123").build();
+    private final Area area = new Area(1L, "서울", "1");
+    private final AreaDetail areaDetail = new AreaDetail(1L, area, "강남구", "1");
+    private final Content content1 = Content.builder().id(1L).build();
+    private final Content content2 = Content.builder().id(2L).build();
+
     private PlanRequest planRequest;
-    private User user;
-    private AreaDetail areaDetail;
     private Plan plan;
 
     @BeforeEach
     void setUp() {
-        user = User.builder()
-                .id(1L)
-                .username("testUser123")
-                .build();
-
-        areaDetail = AreaDetail.builder()
-                .id(1L)
-                .name("Test Area")
-                .build();
-
         planRequest = PlanRequest.builder()
                 .title("Test Plan")
                 .description("This is a test plan.")
@@ -79,25 +73,13 @@ public class PlanServiceTest {
                 .isPublic(true)
                 .build();
 
-        plan = Plan.builder()
-                .id(1L)
-                .user(user)
-                .areaDetail(areaDetail)
-                .title(planRequest.getTitle())
-                .description(planRequest.getDescription())
-                .startDate(planRequest.getStartDate())
-                .endDate(planRequest.getEndDate())
-                .isPublic(planRequest.getIsPublic())
-                .build();
+        plan = Plan.of(planRequest, user, areaDetail, List.of(content1, content2));
     }
 
     @Test
     @DisplayName("플랜 생성 성공")
     void createPlan_Success() {
         // Given
-        Content content1 = Content.builder().id(1L).build();
-        Content content2 = Content.builder().id(2L).build();
-
         when(userHelper.getCurrentUser()).thenReturn(user);
         when(areaDetailRepository.findById(planRequest.getAreaDetailId())).thenReturn(Optional.of(areaDetail));
         when(contentRepository.findById(1L)).thenReturn(Optional.of(content1));
@@ -109,6 +91,13 @@ public class PlanServiceTest {
 
         // Then
         assertEquals(plan.getId(), response.getPlanId());
-        verify(planRepository, times(1)).save(any(Plan.class));
+        verify(planRepository, times(1)).save(argThat(plan ->
+                plan.getAreaDetail().equals(areaDetail) &&
+                plan.getContents().equals(List.of(content1, content2)) &&
+                plan.getTitle().equals(planRequest.getTitle()) &&
+                plan.getDescription().equals(planRequest.getDescription()) &&
+                plan.getStartDate().equals(planRequest.getStartDate()) &&
+                plan.getEndDate().equals(planRequest.getEndDate())
+        ));
     }
 }
