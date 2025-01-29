@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.AuthenticationException;
@@ -25,8 +26,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     private final RefreshRepository refreshRepository;
     private final JWTUtil jwtUtil;
 
-    public CustomLoginFilter(
-            AuthenticationManager authenticationManager, RefreshRepository refreshRepository, JWTUtil jwtUtil) {
+    public CustomLoginFilter(AuthenticationManager authenticationManager, RefreshRepository refreshRepository, JWTUtil jwtUtil) {
         this.authenticationManager = authenticationManager;
         this.refreshRepository = refreshRepository;
         this.jwtUtil = jwtUtil;
@@ -38,15 +38,23 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     public Authentication attemptAuthentication(
             HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
 
-        // 클라이언트 요청에서 username, password 추출
-        String username = obtainUsername(request);
-        String password = obtainPassword(request);
+        // POST 요청만 허용
+        if (!request.getMethod().equals("POST")) {
+            throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
+        }
 
-        // username, password 검증하기 위해 token에 담음
-        UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(username, password, null);
+        // 클라이언트 요청에서 username, password 추출
+        String username = this.obtainUsername(request);
+        String password = this.obtainPassword(request);
+
+        username = username != null ? username.trim() : "";
+        password = password != null ? password : "";
+
+        // username, password 검증하기 위해 authRequest 생성
+        UsernamePasswordAuthenticationToken authRequest = UsernamePasswordAuthenticationToken.unauthenticated(username, password);
 
         // token 정보 검증을 위한 AuthenticationManager 전달
-        return authenticationManager.authenticate(authToken);
+        return authenticationManager.authenticate(authRequest);
     }
 
     // 로그인 성공시 실행하는 메소드 (JWT 발급)

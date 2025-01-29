@@ -39,6 +39,7 @@ public class UserHelper {
     }
 
     public User getCurrentUser() {
-        return userRepository.findByUsername(getAuthenticatedUser().getUsername());
+        return userRepository.findByUsername(getAuthenticatedUser().getUsername())
+                .orElseThrow(() -> new ApplicationException(ApplicationError.USER_IS_NOT_FOUND));
     }
 }

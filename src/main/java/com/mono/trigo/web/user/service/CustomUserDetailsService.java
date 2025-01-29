@@ -26,14 +26,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     // 사용자 인증 시 호출하는 메서드 - 주어진 사용자 이름(username)을 기반으로 사용자 정보를 로드
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
 
-        // 사용자가 존재하지 않으면 throw UsernameNotFoundException
-        if (user == null) {
-            throw new ApplicationException(ApplicationError.USER_IS_NOT_FOUND);
-        }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ApplicationException(ApplicationError.USER_IS_NOT_FOUND));
 
-        // 사용자가 존재하면 CustomUserDetails로 변환하여 반환
         return new CustomUserDetails(user);
     }
 }
