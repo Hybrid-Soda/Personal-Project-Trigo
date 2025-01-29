@@ -79,9 +79,9 @@ public class SecurityConfig {
                 )
                 // 커스텀 logout filter 추가
                 .addFilterBefore(new CustomLogoutFilter(jwtUtil, refreshRepository), LogoutFilter.class)
-                // authentication - JWTAuthenticationFilter 이전에 JWTFilter 추가
+                // authentication - CustomLoginFilter 이전에 JWTFilter 추가
                 .addFilterBefore(new JWTFilter(jwtUtil), CustomLoginFilter.class)
-                // authentication - UsernamePasswordAuthenticationFilter 동일한 위치에 JWTAuthenticationFilter 추가
+                // authentication - UsernamePasswordAuthenticationFilter 동일한 위치에 CustomLoginFilter 추가
                 .addFilterAt(
                         new CustomLoginFilter(authenticationManager(authenticationConfiguration), refreshRepository, jwtUtil),
                         UsernamePasswordAuthenticationFilter.class)
