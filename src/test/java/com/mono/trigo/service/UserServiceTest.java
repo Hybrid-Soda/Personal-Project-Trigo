@@ -1,4 +1,4 @@
-package com.mono.trigo.service.user;
+package com.mono.trigo.service;
 
 import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.user.entity.User;

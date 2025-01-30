@@ -66,9 +66,7 @@ public class UserService {
             throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
         }
 
-        user.setNickname(userRequest.getNickname());
-        user.setBirthday(userRequest.getBirthday());
-        user.setGender(userRequest.getGender());
+        user.update(userRequest);
         userRepository.save(user);
     }
 

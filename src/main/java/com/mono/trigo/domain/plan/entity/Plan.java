@@ -68,4 +68,14 @@ public class Plan extends BaseEntity {
                 .isPublic(planRequest.getIsPublic())
                 .build();
     }
+
+    public void update(AreaDetail areaDetail, PlanRequest planRequest, List<Content> contents) {
+        this.setAreaDetail(areaDetail);
+        this.setTitle(planRequest.getTitle());
+        this.setDescription(planRequest.getDescription());
+        this.setStartDate(planRequest.getStartDate());
+        this.setEndDate(planRequest.getEndDate());
+        this.setIsPublic(planRequest.getIsPublic());
+        this.setContents(contents);
+    }
 }

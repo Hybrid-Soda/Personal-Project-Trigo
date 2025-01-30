@@ -1,4 +1,4 @@
-package com.mono.trigo.service.content;
+package com.mono.trigo.service;
 
 import com.mono.trigo.domain.area.entity.Area;
 import com.mono.trigo.domain.area.entity.AreaDetail;

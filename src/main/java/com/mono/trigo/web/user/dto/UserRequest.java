@@ -1,6 +1,7 @@
 package com.mono.trigo.web.user.dto;
 
 import com.mono.trigo.domain.user.entity.Gender;
+import com.mono.trigo.domain.user.entity.User;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -15,5 +16,4 @@ public class UserRequest {
     private String nickname;
     private LocalDate birthday;
     private Gender gender;
-
 }

@@ -1,4 +1,4 @@
-package com.mono.trigo.service.review;
+package com.mono.trigo.service;
 
 import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.impl.UserHelper;

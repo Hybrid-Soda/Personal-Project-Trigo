@@ -71,9 +71,9 @@ public class UserController {
 
     // 토큰 재발급
     @PostMapping("/reissue")
-    public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public void reissue(HttpServletRequest request, HttpServletResponse response) {
         reissueService.reissue(request, response);
-        return ResponseEntity.status(200).body("Access token updated successfully");
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 
     // 관리자

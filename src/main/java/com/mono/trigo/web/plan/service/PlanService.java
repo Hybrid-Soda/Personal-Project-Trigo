@@ -102,13 +102,7 @@ public class PlanService {
             }
         }
 
-        plan.setAreaDetail(areaDetail);
-        plan.setTitle(planRequest.getTitle());
-        plan.setDescription(planRequest.getDescription());
-        plan.setStartDate(planRequest.getStartDate());
-        plan.setEndDate(planRequest.getEndDate());
-        plan.setIsPublic(planRequest.getIsPublic());
-        plan.setContents(contents);
+        plan.update(areaDetail, planRequest, contents);
         planRepository.save(plan);
     }
 

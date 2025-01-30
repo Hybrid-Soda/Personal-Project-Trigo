@@ -3,6 +3,7 @@ package com.mono.trigo.domain.user.entity;
 import com.mono.trigo.common.audit.BaseEntity;
 
 import com.mono.trigo.web.user.dto.SignupRequest;
+import com.mono.trigo.web.user.dto.UserRequest;
 import lombok.*;
 import jakarta.persistence.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -52,5 +53,11 @@ public class User extends BaseEntity {
                 .gender(signupRequest.getGender())
                 .role(role != null ? role : "member")
                 .build();
+    }
+
+    public void update(UserRequest userRequest) {
+        this.setNickname(userRequest.getNickname());
+        this.setBirthday(userRequest.getBirthday());
+        this.setGender(userRequest.getGender());
     }
 }

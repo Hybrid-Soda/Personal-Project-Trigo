@@ -33,6 +33,7 @@ public class SecurityConfig {
             "/swagger-ui/**",
             "/api/v1/users/signup",
             "/api/v1/users/login",
+            "/api/v1/users/reissue",
             "/api/v1/plans",
             "/api/v1/reviews",
             "/api/v1/contents",
@@ -91,5 +92,4 @@ public class SecurityConfig {
                 .sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
-
 }
