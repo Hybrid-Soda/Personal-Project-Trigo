@@ -72,33 +72,13 @@ public class UserController {
     // 토큰 재발급
     @PostMapping("/reissue")
     public ResponseEntity<String> reissue(HttpServletRequest request, HttpServletResponse response) {
-        try {
-            // refreshToken 확인
-            String refreshToken = reissueService.getRefreshToken(request);
-            reissueService.validateRefreshToken(refreshToken);
-
-            // accessToken 갱신
-            TokenResponse tokenResponse = reissueService.generateNewTokens(refreshToken);
-            response.setHeader("access", tokenResponse.getAccessToken());
-            response.addCookie(createCookie(tokenResponse.getRefreshToken()));
-
-            return ResponseEntity.status(200).body("Access token updated successfully");
-        } catch (Exception e) {
-            throw new ApplicationException(ApplicationError.UNRECOGNIZED_ERROR);
-        }
+        reissueService.reissue(request, response);
+        return ResponseEntity.status(200).body("Access token updated successfully");
     }
 
     // 관리자
     @GetMapping("/admin")
     public ResponseEntity<String> admin() {
         return ResponseEntity.status(200).body("admin controller");
-    }
-
-    private Cookie createCookie(String value) {
-        Cookie cookie = new Cookie("refresh", value);
-        cookie.setMaxAge(60*60*24);
-        cookie.setHttpOnly(true);
-
-        return cookie;
     }
 }
