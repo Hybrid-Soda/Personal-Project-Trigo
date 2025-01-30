@@ -17,8 +17,10 @@ public enum ApplicationError implements ErrorCode {
     NICKNAME_IS_EXISTED(HttpStatus.CONFLICT, "해당 닉네임을 사용할 수 없습니다.", HttpStatus.CONFLICT.value()),
 
     // auth
+    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, "인증에 실패하였습니다.", HttpStatus.UNAUTHORIZED.value()),
     ACCESS_TOKEN_NOT_FOUND(HttpStatus.UNAUTHORIZED,"액세스 토큰을 찾을 수 없습니다.", HttpStatus.UNAUTHORIZED.value()),
     ACCESS_TOKEN_IS_INVALID(HttpStatus.UNAUTHORIZED,"액세스 토큰이 유효하지 않습니다.", HttpStatus.UNAUTHORIZED.value()),
+    INVALID_REQUEST_METHOD(HttpStatus.METHOD_NOT_ALLOWED, "지원하지 않는 HTTP 메서드입니다.", HttpStatus.METHOD_NOT_ALLOWED.value()),
 
     // plan
     PLAN_IS_NOT_FOUND(HttpStatus.NOT_FOUND, "일정을 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),

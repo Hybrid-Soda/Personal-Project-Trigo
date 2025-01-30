@@ -2,13 +2,15 @@ package com.mono.trigo.web.jwt;
 
 import com.mono.trigo.domain.user.entity.Refresh;
 import com.mono.trigo.domain.user.repository.RefreshRepository;
+import com.mono.trigo.web.exception.entity.ApplicationError;
+import com.mono.trigo.web.exception.advice.ApplicationException;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.AuthenticationException;
@@ -16,9 +18,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.Collection;
 
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -40,7 +42,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
         // POST 요청만 허용
         if (!request.getMethod().equals("POST")) {
-            throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
+            throw new ApplicationException(ApplicationError.INVALID_REQUEST_METHOD);
         }
 
         // 클라이언트 요청에서 username, password 추출
@@ -57,7 +59,13 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         return authenticationManager.authenticate(authRequest);
     }
 
-    // 로그인 성공시 실행하는 메소드 (JWT 발급)
+    public void getSuccessHandler(HttpServletRequest request, HttpServletResponse response,
+                                            FilterChain chain, Authentication authentication) {
+
+        this.successfulAuthentication(request, response, chain, authentication);
+    }
+
+    // 인증 성공시 실행하는 메소드 (JWT 발급)
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authentication) {
@@ -82,12 +90,12 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setStatus(HttpStatus.OK.value());
     }
 
-    // 로그인 실패시 실행하는 에소드
+    // 인증 실패시 실행하는 에소드
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException failed) {
         // 401 응답 코드 반환
-        response.setStatus(401);
+        throw new ApplicationException(ApplicationError.AUTHENTICATION_FAILED);
     }
 
     private Cookie createCookie(String value) {

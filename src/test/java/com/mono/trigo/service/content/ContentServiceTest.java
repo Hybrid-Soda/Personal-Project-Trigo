@@ -97,8 +97,8 @@ class ContentServiceTest {
         when(contentRepository.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then
-        ApplicationException exception = assertThrows(ApplicationException.class,
-                () -> contentService.getContentById(1L));
+        ApplicationException exception =
+                assertThrows(ApplicationException.class, () -> contentService.getContentById(1L));
         assertEquals(ApplicationError.CONTENT_IS_NOT_FOUND, exception.getError());
     }
 }
