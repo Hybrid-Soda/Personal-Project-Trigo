@@ -121,6 +121,24 @@ class PlanServiceTest {
     }
 
     @Test
+    @DisplayName("전체 일정 조회 성공")
+    void getAllPlans_Success() {
+        // Given
+        Plan plan1 = Plan.builder().id(1L).title("plan1").user(user).build();
+        Plan plan2 = Plan.builder().id(2L).title("plan2").user(user).build();
+
+        when(planRepository.findAll()).thenReturn(List.of(plan1, plan2));
+
+        // When
+        List<PlanResponse> plans = planService.getAllPlans();
+
+        // Then
+        assertEquals(2, plans.size());
+        assertEquals(plan1.getId(), plans.get(0).getPlanId());
+        assertEquals(plan2.getId(), plans.get(1).getPlanId());
+    }
+
+    @Test
     @DisplayName("일정 조회 성공")
     void getPlanById_Success() {
         // Given
