@@ -17,7 +17,8 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
                     // 파일 복사 후 경로에 붙여넣기
-                    withCredentials([file(credentialsId: 'application-secret', variable: 'SECRET_YML')]) {
+                    withCredentials([file(credentialsId: 'application-prod', variable: 'PROD_YML'), file(credentialsId: 'application-secret', variable: 'SECRET_YML')]) {
+                        sh 'cp $PROD_YML ${JENKINS_HOME}/workspace/backend/src/main/resources/application-prod.yml || echo "Already"'
                         sh 'cp $SECRET_YML ${JENKINS_HOME}/workspace/backend/src/main/resources/application-secret.yml || echo "Already"'
                     }
                 }
