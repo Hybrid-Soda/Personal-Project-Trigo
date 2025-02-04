@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        TARGET_HOST = "ubuntu@54.180.104.67"
+        TARGET_HOST = "ubuntu@trigo365.shop"
         IMAGE_NAME = "spring"
         UBUNTU_HOME = "/home/ubuntu/app"
         JENKINS_HOME = "/var/jenkins_home"
@@ -38,7 +38,7 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
                     sh '''
-                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker rmi ${IMAGE_NAME}:${LAST_VERSION} || echo "Delete failed, continuing...""
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker rmi ${IMAGE_NAME} || echo "Delete failed, continuing...""
                     '''
                 }
             }
@@ -62,6 +62,7 @@ pipeline {
             steps{
                 sshagent (credentials: ['ssh-credential']){
                    sh '''
+                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker compose -f ./spring/docker-compose.yml down"
                         ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker compose -f ./spring/docker-compose.yml up -d"
                    '''
                 }
