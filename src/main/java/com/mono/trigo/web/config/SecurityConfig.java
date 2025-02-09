@@ -38,6 +38,7 @@ public class SecurityConfig {
             "/api/v1/reviews",
             "/api/v1/contents",
             "/api/v1/open-api/**",
+            "/actuator/**",
     };
 
     private final AuthenticationConfiguration authenticationConfiguration;
