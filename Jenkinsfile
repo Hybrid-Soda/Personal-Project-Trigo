@@ -15,9 +15,12 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
                     // 파일 복사 후 경로에 붙여넣기
-                    withCredentials([file(credentialsId: 'application-prod', variable: 'PROD_YML'), file(credentialsId: 'application-secret', variable: 'SECRET_YML')]) {
-                        sh 'cp -f $PROD_YML ${JENKINS_HOME}/workspace/backend/src/main/resources/application-prod.yml'
-                        sh 'cp -f $SECRET_YML ${JENKINS_HOME}/workspace/backend/src/main/resources/application-secret.yml'
+                    withCredentials([
+                        file(credentialsId: 'application-prod', variable: 'PROD_YML'),
+                        file(credentialsId: 'application-secret', variable: 'SECRET_YML')
+                    ]) {
+                        sh "cp -f \$PROD_YML ${JENKINS_HOME}/workspace/backend/src/main/resources/application-prod.yml"
+                        sh "cp -f \$SECRET_YML ${JENKINS_HOME}/workspace/backend/src/main/resources/application-secret.yml"
                     }
                 }
             }
@@ -26,8 +29,8 @@ pipeline {
         stage('Build') {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
-                    sh 'chmod +x ./gradlew'            // 권한 부여
-                    sh './gradlew clean build -x test' // gradlew 빌드
+                    sh "chmod +x ./gradlew"            // 권한 부여
+                    sh "./gradlew clean build -x test" // gradlew 빌드
                 }
             }
         }
@@ -35,10 +38,16 @@ pipeline {
         stage('Docker Compose Down') {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
-                    sh '''
-                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker compose -f ./backend/docker-compose.yml down || true"
-                        ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker rmi -f ${IMAGE_NAME}:latest"
-                    '''
+                script {
+                        parallel (
+                            "Stop Containers": {
+                                sh "ssh -o StrictHostKeyChecking=no ${TARGET_HOST} 'docker compose -f ./backend/docker-compose.yml down || true'"
+                            },
+                            "Remove Docker Image": {
+                                sh "ssh -o StrictHostKeyChecking=no ${TARGET_HOST} 'docker rmi -f ${IMAGE_NAME}:latest'"
+                            }
+                        )
+                    }
                 }
             }
         }
@@ -47,12 +56,20 @@ pipeline {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
                     // Dockerfile 과 JAR 파일을 같은 디렉토리로 복사
-                    sh 'cp -f Dockerfile ${JENKINS_HOME}/Dockerfile'
-                    sh 'cp -f ./build/libs/${BUILD_FILE} ${JENKINS_HOME}/${BUILD_FILE}'
+                    script {
+                        parallel (
+                            "Copy Dockerfile": {
+                                sh "cp -f Dockerfile ${JENKINS_HOME}/Dockerfile"
+                            },
+                            "Copy JAR File": {
+                                sh "cp -f ./build/libs/${BUILD_FILE} ${JENKINS_HOME}/${BUILD_FILE}"
+                            }
+                        )
+                    }
                     // Dockerfile 불러오기 및 Image 빌드
-                    sh '''
+                    sh """
                         ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "cd /var/lib/jenkins && docker build -f Dockerfile -t ${IMAGE_NAME}:latest ."
-                    '''
+                    """
                 }
             }
         }
@@ -60,9 +77,9 @@ pipeline {
         stage('Deploy'){
             steps{
                 sshagent (credentials: ['ssh-credential']){
-                   sh '''
+                   sh """
                         ssh -o StrictHostKeyChecking=no ${TARGET_HOST} "docker compose -f ./backend/docker-compose.yml up -d"
-                   '''
+                   """
                 }
             }
         }
