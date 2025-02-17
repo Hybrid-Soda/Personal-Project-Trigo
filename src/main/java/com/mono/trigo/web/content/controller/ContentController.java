@@ -1,5 +1,6 @@
 package com.mono.trigo.web.content.controller;
 
+import com.mono.trigo.common.audit.aop.LogExecutionTime;
 import com.mono.trigo.web.content.dto.ContentResponse;
 import com.mono.trigo.web.content.dto.ContentSearchCondition;
 import com.mono.trigo.web.content.service.ContentService;
@@ -23,6 +24,7 @@ public class ContentController {
     }
 
     @GetMapping
+    @LogExecutionTime
     public ResponseEntity<List<ContentResponse>> searchContents(
             @Nullable @RequestParam String arrange,
             @Nullable @RequestParam String areaCode,
@@ -40,6 +42,7 @@ public class ContentController {
     }
 
     @GetMapping("/{contentId}")
+    @LogExecutionTime
     public ResponseEntity<ContentResponse> getContentById(@PathVariable Long contentId) {
         ContentResponse response = contentService.getContentById(contentId);
         return ResponseEntity.status(200).body(response);
