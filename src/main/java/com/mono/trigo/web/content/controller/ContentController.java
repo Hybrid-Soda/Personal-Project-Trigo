@@ -7,6 +7,7 @@ import com.mono.trigo.web.content.service.ContentService;
 import jakarta.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,19 +26,16 @@ public class ContentController {
 
     @GetMapping
     @LogExecutionTime
-    public ResponseEntity<List<ContentResponse>> searchContents(
+    public ResponseEntity<Page<ContentResponse>> searchContents(
             @Nullable @RequestParam String arrange,
             @Nullable @RequestParam String areaCode,
             @Nullable @RequestParam String areaDetailCode,
-            @Nullable @RequestParam String contentTypeCode
+            @Nullable @RequestParam String contentTypeCode,
+            @Nullable @RequestParam Integer numOfRows,
+            @Nullable @RequestParam Integer pageNo
     ) {
-        ContentSearchCondition condition = ContentSearchCondition.builder()
-                .arrange(arrange)
-                .areaCode(areaCode)
-                .areaDetailCode(areaDetailCode)
-                .contentTypeCode(contentTypeCode)
-                .build();
-        List<ContentResponse> response = contentService.searchContents(condition);
+        ContentSearchCondition condition = new ContentSearchCondition(arrange, areaCode, areaDetailCode, contentTypeCode);
+        Page<ContentResponse> response = contentService.searchContents(condition, numOfRows, pageNo);
         return ResponseEntity.status(200).body(response);
     }
 

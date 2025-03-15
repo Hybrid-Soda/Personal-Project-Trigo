@@ -20,6 +20,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -51,16 +55,19 @@ class ContentServiceTest {
         // Given
         ContentSearchCondition condition = new ContentSearchCondition("C", "1", "1", "A01010001");
         List<Content> contents = List.of(content1, content2);
-        when(contentRepository.searchContents(condition)).thenReturn(contents);
+        PageRequest pageRequest = PageRequest.of(1, 10);
+        Page<Content> page = new PageImpl<>(contents, pageRequest, contents.size());
+
+        when(contentRepository.searchContents(eq(condition), any(Pageable.class))).thenReturn(page);
 
         // When
-        List<ContentResponse> responses = contentService.searchContents(condition);
+        Page<ContentResponse> responses = contentService.searchContents(condition, 10, 1);
 
         // Then
-        assertEquals(2, responses.size());
-        assertEquals(content1.getId(), responses.get(0).getId());
-        assertEquals(content2.getId(), responses.get(1).getId());
-        verify(contentRepository, times(1)).searchContents(condition);
+        assertEquals(2, responses.getContent().size());
+        assertEquals(content1.getId(), responses.getContent().get(0).getId());
+        assertEquals(content2.getId(), responses.getContent().get(1).getId());
+        verify(contentRepository, times(1)).searchContents(eq(condition), any(Pageable.class));
     }
 
     @Test
