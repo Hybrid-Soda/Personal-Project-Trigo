@@ -3,8 +3,11 @@ package com.mono.trigo.domain.content.entity;
 import com.mono.trigo.common.audit.BaseEntity;
 import com.mono.trigo.domain.area.entity.AreaDetail;
 
+import com.mono.trigo.openApi.dto.ContentDto;
 import lombok.*;
 import jakarta.persistence.*;
+
+import static com.mono.trigo.domain.user.entity.QUser.user;
 
 @Getter
 @Setter
@@ -50,4 +53,19 @@ public class Content extends BaseEntity {
 
     @Column(name = "first_image2", length = 512)
     private String firstImage2;
+
+    public static Content of(ContentDto contentDto, ContentType contentType, AreaDetail areaDetail) {
+        return builder()
+                .contentType(contentType)
+                .areaDetail(areaDetail)
+                .title(contentDto.getTitle())
+                .mapX(contentDto.getMapx())
+                .mapY(contentDto.getMapy())
+                .addr1(contentDto.getAddr1())
+                .addr2(contentDto.getAddr2())
+                .tel(contentDto.getTel())
+                .firstImage(contentDto.getFirstimage())
+                .firstImage2(contentDto.getFirstimage2())
+                .build();
+    }
 }

@@ -14,7 +14,7 @@ public class ExecutionTimeAspect {
 
     private Logger log = LoggerFactory.getLogger(ExecutionTimeAspect.class);
 
-    @Around("execution(* com.example)")
+    @Around("execution(* com.mono.trigo.web..*(..))")
     public Object logExecutionTime(ProceedingJoinPoint joinPoint) throws Throwable {
         long t = System.currentTimeMillis();
         Object result = joinPoint.proceed();

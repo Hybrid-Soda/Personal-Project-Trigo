@@ -35,7 +35,7 @@ public class OpenApiHelper {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromUriString(baseUri + endpoint)
                 .queryParam("serviceKey", serviceKey)
                 .queryParam("numOfRows", 200)
-                .queryParam("pageNo", 5)
+                .queryParam("pageNo", 31)
                 .queryParam("MobileOS", "ETC")
                 .queryParam("MobileApp", "testApp")
                 .queryParam("_type", "json");

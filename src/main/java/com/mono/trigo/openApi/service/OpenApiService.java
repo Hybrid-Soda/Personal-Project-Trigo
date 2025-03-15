@@ -133,18 +133,7 @@ public class OpenApiService {
 
             if (contentType == null || areaDetail == null) continue;
 
-            Content content = Content.builder()
-                    .contentType(contentType)
-                    .areaDetail(areaDetail)
-                    .title(contentDto.getTitle())
-                    .mapX(contentDto.getMapx())
-                    .mapY(contentDto.getMapy())
-                    .addr1(contentDto.getAddr1())
-                    .addr2(contentDto.getAddr2())
-                    .tel(contentDto.getTel())
-                    .firstImage(contentDto.getFirstimage())
-                    .firstImage2(contentDto.getFirstimage2())
-                    .build();
+            Content content = Content.of(contentDto, contentType, areaDetail);
             contentRepository.save(content);
         }
     }
