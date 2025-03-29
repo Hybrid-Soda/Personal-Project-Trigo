@@ -15,6 +15,9 @@ import static com.mono.trigo.domain.user.entity.QUser.user;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity(name = "Contents")
+@Table(indexes = {
+        @Index(name = "CONTENT_AREA", columnList = "content_type_id, area_detail_id")
+})
 public class Content extends BaseEntity {
 
     @Id
