@@ -31,7 +31,7 @@ public class Plan extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "area_detail_id", nullable = false)
     private AreaDetail areaDetail;
 

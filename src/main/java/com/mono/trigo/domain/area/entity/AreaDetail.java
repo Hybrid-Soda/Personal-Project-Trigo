@@ -16,7 +16,7 @@ public class AreaDetail {
     @Column(name = "area_detail_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "area_id", nullable = false)
     private Area area;
 
