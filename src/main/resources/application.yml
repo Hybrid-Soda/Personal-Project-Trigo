@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: secret, prod
+    include: secret, local
 
 #management:
 #  metrics:

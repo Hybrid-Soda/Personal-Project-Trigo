@@ -27,11 +27,11 @@ public class Plan extends BaseEntity {
     @Column(name = "plan_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_detail_id", nullable = false)
     private AreaDetail areaDetail;
 
