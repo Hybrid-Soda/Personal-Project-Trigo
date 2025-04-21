@@ -25,11 +25,11 @@ public class Content extends BaseEntity {
     @Column(name = "content_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "content_type_id", nullable = false)
     private ContentType contentType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "area_detail_id", nullable = false)
     private AreaDetail areaDetail;
 
