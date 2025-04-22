@@ -16,8 +16,8 @@ import java.time.LocalDateTime;
 public class ContentResponse {
 
     private Long id;
-    private ContentType contentType;
-    private AreaDetail areaDetail;
+    private String contentType;
+    private ContentAreaDetailResponse contentAreaDetailResponse;
     private String title;
     private Double mapX;
     private Double mapY;
@@ -32,8 +32,8 @@ public class ContentResponse {
     public static ContentResponse of(Content content) {
         return builder()
                 .id(content.getId())
-                .contentType(content.getContentType())
-                .areaDetail(content.getAreaDetail())
+                .contentType(content.getContentType().getName())
+                .contentAreaDetailResponse(ContentAreaDetailResponse.of(content.getAreaDetail()))
                 .title(content.getTitle())
                 .mapX(content.getMapX())
                 .mapY(content.getMapY())
