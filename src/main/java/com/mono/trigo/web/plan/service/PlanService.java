@@ -19,7 +19,6 @@ import com.mono.trigo.web.exception.advice.ApplicationException;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -57,7 +56,7 @@ public class PlanService {
 
     public List<PlanResponse> getAllPlans() {
 
-        List<Plan> plans = planRepository.findAll();
+        List<Plan> plans = planRepository.findAllByIsPublicTrue();
 
         return plans.stream()
                 .map(PlanResponse::of)
