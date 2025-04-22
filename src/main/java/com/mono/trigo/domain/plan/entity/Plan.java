@@ -35,9 +35,13 @@ public class Plan extends BaseEntity {
     @JoinColumn(name = "area_detail_id", nullable = false)
     private AreaDetail areaDetail;
 
-    @OneToMany
+    @ManyToMany
     @Builder.Default
-    @JoinColumn(name = "plan_id")
+    @JoinTable(
+            name = "plan_content",
+            joinColumns = @JoinColumn(name = "plan_id"),
+            inverseJoinColumns = @JoinColumn(name = "content_id")
+    )
     private List<Content> contents = new ArrayList<>();
 
     @Column(nullable = false, length = 100)
