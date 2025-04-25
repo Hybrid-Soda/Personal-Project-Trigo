@@ -9,6 +9,7 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -20,7 +21,7 @@ public class PlanResponse {
     private Long planId; // 일정 ID
     private Long userId; // 유저 ID
     private ContentAreaDetailResponse contentAreaDetailResponse; // 지역 ID
-    private List<Content> contents; // 여행지 목록
+    private List<Long> contentIds; // 여행지 목록
     private String title; // 일정 제목
     private String description; // 일정 설명
     private LocalDate startDate; // YYYY-MM-DD 형식
@@ -29,11 +30,13 @@ public class PlanResponse {
     private LocalDateTime modifiedDate;
 
     public static PlanResponse of(Plan plan) {
+        List<Long> contentIds = getContentIds(plan.getContents());
+
         return builder()
                 .planId(plan.getId())
                 .userId(plan.getUser().getId())
                 .contentAreaDetailResponse(ContentAreaDetailResponse.of(plan.getAreaDetail()))
-                .contents(plan.getContents())
+                .contentIds(contentIds)
                 .title(plan.getTitle())
                 .description(plan.getDescription())
                 .startDate(plan.getStartDate())
@@ -41,5 +44,11 @@ public class PlanResponse {
                 .createdDate(plan.getCreatedDate())
                 .modifiedDate(plan.getModifiedDate())
                 .build();
+    }
+
+    private static List<Long> getContentIds(List<Content> contents) {
+        return contents.stream()
+                .map(Content::getId)
+                .collect(Collectors.toList());
     }
 }
