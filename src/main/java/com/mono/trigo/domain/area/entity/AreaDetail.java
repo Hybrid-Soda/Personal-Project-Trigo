@@ -2,12 +2,14 @@ package com.mono.trigo.domain.area.entity;
 
 import lombok.*;
 import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@BatchSize(size = 50)
 @Entity(name = "AreaDetails")
 public class AreaDetail {
 

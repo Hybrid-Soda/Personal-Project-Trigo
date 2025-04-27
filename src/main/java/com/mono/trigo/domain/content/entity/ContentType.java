@@ -2,10 +2,12 @@ package com.mono.trigo.domain.content.entity;
 
 import lombok.*;
 import jakarta.persistence.*;
+import org.hibernate.annotations.BatchSize;
 
 @Getter
 @Setter
 @NoArgsConstructor
+@BatchSize(size = 50)
 @Entity(name = "ContentTypes")
 public class ContentType {
 

@@ -7,7 +7,6 @@ import com.mono.trigo.openApi.dto.ContentDto;
 import lombok.*;
 import jakarta.persistence.*;
 
-import static com.mono.trigo.domain.user.entity.QUser.user;
 
 @Getter
 @Setter

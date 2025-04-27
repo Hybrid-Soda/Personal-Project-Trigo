@@ -24,6 +24,7 @@ public class PlanResponse {
     private List<Long> contentIds; // 여행지 목록
     private String title; // 일정 제목
     private String description; // 일정 설명
+    private Boolean isPublic; // 공개 여부
     private LocalDate startDate; // YYYY-MM-DD 형식
     private LocalDate endDate;   // YYYY-MM-DD 형식
     private LocalDateTime createdDate;
@@ -39,6 +40,7 @@ public class PlanResponse {
                 .contentIds(contentIds)
                 .title(plan.getTitle())
                 .description(plan.getDescription())
+                .isPublic(plan.getIsPublic())
                 .startDate(plan.getStartDate())
                 .endDate(plan.getEndDate())
                 .createdDate(plan.getCreatedDate())

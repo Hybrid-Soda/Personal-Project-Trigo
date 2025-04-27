@@ -9,8 +9,7 @@ import com.mono.trigo.domain.content.entity.Content;
 
 import lombok.*;
 import jakarta.persistence.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -38,10 +37,14 @@ public class Plan extends BaseEntity {
     private AreaDetail areaDetail;
 
     @Builder.Default
+    @BatchSize(size = 200)
     @JoinTable(
             name = "plan_content",
             joinColumns = @JoinColumn(name = "plan_id"),
-            inverseJoinColumns = @JoinColumn(name = "content_id")
+            inverseJoinColumns = @JoinColumn(name = "content_id"),
+            uniqueConstraints = @UniqueConstraint(
+                name = "plan_content_id", columnNames = {"plan_id", "content_id"}
+            )
     )
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Content> contents = new ArrayList<>();
