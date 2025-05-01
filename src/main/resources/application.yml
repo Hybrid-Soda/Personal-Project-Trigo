@@ -1,7 +1,6 @@
 spring:
   profiles:
     include: secret, prod
-#  jackson.serialization.fail-on-empty.beans: false
 
 #management:
 #  metrics:
