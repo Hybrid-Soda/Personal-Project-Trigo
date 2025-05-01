@@ -1,10 +1,9 @@
 pipeline {
     agent any
     environment {
-        TARGET_HOST = "ubuntu@43.200.176.180"
+        TARGET_HOST = "ubuntu@13.209.48.78"
         IMAGE_NAME = "spring"
         UBUNTU_HOME = "/var/lib/jenkins"
-        JENKINS_HOME = "/var/jenkins_home"
         BUILD_FILE = "trigo-0.0.1-SNAPSHOT.jar"
     }
     // sh 작업 경로: ${JENKINS_HOME}/workspace/backend
@@ -14,13 +13,15 @@ pipeline {
         stage('Inject Secret') {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
+                    // 리소스 디렉토리 보장
+                    sh "mkdir -p src/main/resources"
                     // 파일 복사 후 경로에 붙여넣기
                     withCredentials([
                         file(credentialsId: 'application-prod', variable: 'PROD_YML'),
                         file(credentialsId: 'application-secret', variable: 'SECRET_YML')
                     ]) {
-                        sh "cp -f \$PROD_YML ${JENKINS_HOME}/workspace/backend/src/main/resources/application-prod.yml"
-                        sh "cp -f \$SECRET_YML ${JENKINS_HOME}/workspace/backend/src/main/resources/application-secret.yml"
+                        sh "cp -f \$PROD_YML src/main/resources/application-prod.yml"
+                        sh "cp -f \$SECRET_YML src/main/resources/application-secret.yml"
                     }
                 }
             }
@@ -38,15 +39,53 @@ pipeline {
         stage('Docker Compose Down') {
             steps {
                 sshagent(credentials: ['ssh-credential']) {
-                script {
-                        parallel (
-                            "Stop Containers": {
-                                sh "ssh -o StrictHostKeyChecking=no ${TARGET_HOST} 'docker compose -f ./backend/docker-compose.yml down || true'"
-                            },
-                            "Remove Docker Image": {
-                                sh "ssh -o StrictHostKeyChecking=no ${TARGET_HOST} 'docker rmi -f ${IMAGE_NAME}:latest'"
-                            }
-                        )
+                    script {
+                        // 1) 실행 중인 컨테이너 ID 조회
+                        def running = sh(
+                            script: """
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} \\
+                                    "docker compose -f ./backend/docker-compose.yml ps -q"
+                            """,
+                            returnStdout: true
+                        ).trim()
+
+                        // 2) ID가 존재할 때만 down 실행
+                        if (running) {
+                            echo "Found running containers (${running.replaceAll('\\n', ', ')}), bringing down…"
+                            sh """
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} \\
+                                    "docker compose -f ./backend/docker-compose.yml down"
+                            """
+                        } else {
+                            echo "No running containers found, skipping 'docker compose down'."
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Remove Docker Image') {
+            steps {
+                sshagent(credentials: ['ssh-credential']) {
+                    script {
+                        // 이미지 존재 여부 확인
+                        def imageId = sh(
+                            script: """
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} \\
+                                    "docker images -q ${IMAGE_NAME}:latest"
+                            """,
+                            returnStdout: true
+                        ).trim()
+
+                        if (imageId) {
+                            echo "Found image ${IMAGE_NAME}:latest (${imageId}), removing…"
+                            sh """
+                                ssh -o StrictHostKeyChecking=no ${TARGET_HOST} \\
+                                    "docker rmi ${IMAGE_NAME}:latest"
+                            """
+                        } else {
+                            echo "No image ${IMAGE_NAME}:latest found on ${TARGET_HOST}, skipping removal."
+                        }
                     }
                 }
             }
@@ -59,10 +98,10 @@ pipeline {
                     script {
                         parallel (
                             "Copy Dockerfile": {
-                                sh "cp -f Dockerfile ${JENKINS_HOME}/Dockerfile"
+                                sh "cp -f Dockerfile \$JENKINS_HOME/Dockerfile"
                             },
                             "Copy JAR File": {
-                                sh "cp -f ./build/libs/${BUILD_FILE} ${JENKINS_HOME}/${BUILD_FILE}"
+                                sh "cp -f ./build/libs/${BUILD_FILE} \$JENKINS_HOME/${BUILD_FILE}"
                             }
                         )
                     }
