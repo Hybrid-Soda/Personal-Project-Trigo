@@ -13,10 +13,10 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 @Configuration
 public class RedisConfig {
 
-    @Value("${redis.server}")
+    @Value("#{environment['spring.redis.server']}")
     private String server;
 
-    @Value("${redis.port}")
+    @Value("#{environment['spring.redis.port']}")
     private Integer port;
 
     @Bean
