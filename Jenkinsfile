@@ -77,7 +77,7 @@ pipeline {
                             echo "Found image ${IMAGE_NAME}:latest (${imageId}), removing…"
                             sh """
                                 ssh -o StrictHostKeyChecking=no ${TARGET_HOST} \\
-                                    "docker rmi ${IMAGE_NAME}:latest"
+                                    "docker rmi -f ${IMAGE_NAME}:latest"
                             """
                         } else {
                             echo "No image ${IMAGE_NAME}:latest found on ${TARGET_HOST}, skipping removal."
