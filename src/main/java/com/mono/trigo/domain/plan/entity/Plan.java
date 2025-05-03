@@ -2,6 +2,7 @@ package com.mono.trigo.domain.plan.entity;
 
 import com.mono.trigo.common.audit.BaseEntity;
 
+import com.mono.trigo.domain.like.entity.Like;
 import com.mono.trigo.web.plan.dto.PlanRequest;
 import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.area.entity.AreaDetail;
@@ -46,7 +47,7 @@ public class Plan extends BaseEntity {
                 name = "plan_content_id", columnNames = {"plan_id", "content_id"}
             )
     )
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Content> contents = new ArrayList<>();
 
     @Column(nullable = false, length = 100)
@@ -64,6 +65,10 @@ public class Plan extends BaseEntity {
     @Builder.Default
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic = false;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "plan", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Like> likes = new ArrayList<>();
 
     public static Plan of(PlanRequest planRequest, User user, AreaDetail areaDetail, List<Content> contents) {
         return builder()

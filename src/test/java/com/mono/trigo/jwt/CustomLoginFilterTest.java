@@ -34,6 +34,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.mockito.Mockito.*;
@@ -56,7 +57,7 @@ class CustomLoginFilterTest {
     private AuthenticationManager authenticationManager;
 
     private final User user = new User(1L, "username123", "password123", "nickname123",
-            LocalDate.of(2000, 1, 1), Gender.MALE, "member");
+            LocalDate.of(2000, 1, 1), Gender.MALE, "member", new ArrayList<>());
 
     private MockHttpServletRequest request;
     private MockHttpServletResponse response;

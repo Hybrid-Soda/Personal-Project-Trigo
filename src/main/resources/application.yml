@@ -1,12 +1,3 @@
 spring:
   profiles:
-    include: secret, prod
-
-#management:
-#  metrics:
-#    tags:
-#      application: trigo
-#  endpoints:
-#    web:
-#      exposure:
-#        include: "*"
+    include: secret

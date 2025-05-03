@@ -2,6 +2,7 @@ package com.mono.trigo.domain.user.entity;
 
 import com.mono.trigo.common.audit.BaseEntity;
 
+import com.mono.trigo.domain.like.entity.Like;
 import com.mono.trigo.web.user.dto.SignupRequest;
 import com.mono.trigo.web.user.dto.UserRequest;
 import lombok.*;
@@ -9,6 +10,8 @@ import jakarta.persistence.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -41,6 +44,10 @@ public class User extends BaseEntity {
     @Builder.Default
     @Column(nullable = false, length = 50)
     private String role = "member";
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Like> likes = new ArrayList<>();
 
     public static User of(SignupRequest signupRequest, String encodedPassword) {
         String role = signupRequest.getRole();

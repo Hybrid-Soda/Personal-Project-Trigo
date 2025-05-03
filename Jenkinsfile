@@ -16,11 +16,7 @@ pipeline {
                     // 리소스 디렉토리 보장
                     sh "mkdir -p src/main/resources"
                     // 파일 복사 후 경로에 붙여넣기
-                    withCredentials([
-                        file(credentialsId: 'application-prod', variable: 'PROD_YML'),
-                        file(credentialsId: 'application-secret', variable: 'SECRET_YML')
-                    ]) {
-                        sh "cp -f \$PROD_YML src/main/resources/application-prod.yml"
+                    withCredentials([file(credentialsId: 'application-secret', variable: 'SECRET_YML')]) {
                         sh "cp -f \$SECRET_YML src/main/resources/application-secret.yml"
                     }
                 }
