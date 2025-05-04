@@ -2,13 +2,13 @@ package com.mono.trigo.web.review.dto;
 
 import com.mono.trigo.domain.user.entity.User;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReviewUserResponse {
 
     private Long userId;

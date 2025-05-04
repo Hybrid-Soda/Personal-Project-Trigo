@@ -7,6 +7,7 @@ import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.review.repository.ReviewRepository;
 import com.mono.trigo.domain.content.repository.ContentRepository;
 
+import com.mono.trigo.web.review.dto.ReviewListResponse;
 import com.mono.trigo.web.review.dto.ReviewRequest;
 import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.review.service.ReviewService;
@@ -103,12 +104,12 @@ class ReviewServiceTest {
         when(reviewRepository.findByContentId(1L)).thenReturn(List.of(review));
 
         // When
-        List<ReviewResponse> responses = reviewService.getReviewByContentId(1L);
+        ReviewListResponse responses = reviewService.getReviewByContentId(1L);
 
         // Then
-        assertEquals(1, responses.size());
-        assertEquals(review.getId(), responses.get(0).getReviewId());
-        assertEquals(review.getReviewContent(), responses.get(0).getReviewContent());
+        assertEquals(1, responses.getReviewResponseList().size());
+        assertEquals(review.getId(), responses.getReviewResponseList().get(0).getReviewId());
+        assertEquals(review.getReviewContent(), responses.getReviewResponseList().get(0).getReviewContent());
     }
 
     @Test
@@ -118,10 +119,10 @@ class ReviewServiceTest {
         when(reviewRepository.findByContentId(1L)).thenReturn(List.of());
 
         // When
-        List<ReviewResponse> responses = reviewService.getReviewByContentId(1L);
+        ReviewListResponse responses = reviewService.getReviewByContentId(1L);
 
         // Then
-        assertEquals(0, responses.size());
+        assertEquals(0, responses.getReviewResponseList().size());
     }
 
     @Test

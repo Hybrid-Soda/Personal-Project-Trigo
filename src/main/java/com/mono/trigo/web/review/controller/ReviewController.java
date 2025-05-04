@@ -1,11 +1,14 @@
 package com.mono.trigo.web.review.controller;
 
+import com.mono.trigo.web.review.dto.ReviewListResponse;
 import com.mono.trigo.web.review.dto.ReviewRequest;
 import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.review.service.ReviewService;
 import com.mono.trigo.web.review.dto.CreateReviewResponse;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
@@ -34,8 +37,11 @@ public class ReviewController {
 
     // 콘텐츠 별 리뷰 조회
     @GetMapping
-    public ResponseEntity<List<ReviewResponse>> getReviewByContentId(@PathVariable Long contentId) {
-        List<ReviewResponse> response = reviewService.getReviewByContentId(contentId);
+    public ResponseEntity<ReviewListResponse> getReviewByContentId(
+            @PathVariable @NotNull(message = "contentId는 필수입니다.")
+            @Min(value = 1, message = "contentId는 1 이상의 값이어야 합니다.")
+            Long contentId) {
+        ReviewListResponse response = reviewService.getReviewByContentId(contentId);
         return ResponseEntity.status(200).body(response);
     }
 

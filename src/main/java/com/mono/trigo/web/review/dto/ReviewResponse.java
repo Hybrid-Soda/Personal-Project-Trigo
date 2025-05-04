@@ -1,7 +1,6 @@
 package com.mono.trigo.web.review.dto;
 
 import com.mono.trigo.domain.review.entity.Review;
-import com.mono.trigo.domain.user.entity.User;
 import lombok.*;
 
 import java.time.LocalDateTime;
