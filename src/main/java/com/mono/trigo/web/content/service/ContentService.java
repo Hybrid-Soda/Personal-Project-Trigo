@@ -45,10 +45,10 @@ public class ContentService {
 
         Content content = contentRepository.findById(contentId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND));
+        ContentResponse contentResponse = ContentResponse.of(content);
 
-        redisTemplate.opsForValue().set(redisKey, ContentResponse.of(content));
-
-        return ContentResponse.of(content);
+        redisTemplate.opsForValue().set(redisKey, contentResponse);
+        return contentResponse;
     }
 
     private PageRequest createPageRequest(Integer pageNo, Integer numOfRows) {

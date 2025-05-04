@@ -33,9 +33,12 @@ public class RedisConfig {
     public ObjectMapper objectMapper() {
 
         ObjectMapper mapper = new ObjectMapper();
-
-        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        mapper
+                // 날짜를 타임스탬프로 쓰지 않도록 비활성화
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                // 날짜/시간 및 Optional 등 JDK8 호환 모듈 등록 (InvalidDefinitionException 방지)
                 .registerModules(new JavaTimeModule(), new Jdk8Module())
+                // 다형성 타입 정보 포함 활성화 (ClassCastException 방지)
                 .activateDefaultTyping(
                         mapper.getPolymorphicTypeValidator(),
                         ObjectMapper.DefaultTyping.NON_FINAL,
