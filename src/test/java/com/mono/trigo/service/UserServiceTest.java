@@ -8,6 +8,7 @@ import com.mono.trigo.domain.review.entity.Review;
 import com.mono.trigo.domain.user.repository.UserRepository;
 import com.mono.trigo.domain.review.repository.ReviewRepository;
 
+import com.mono.trigo.web.review.dto.ReviewListResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
@@ -179,11 +180,11 @@ class UserServiceTest {
         when(reviewRepository.findByUserId(1L)).thenReturn(List.of(review));
 
         // When
-        List<ReviewResponse> responses = userService.getReviewsByUserId(1L);
+        ReviewListResponse responses = userService.getReviewsByUserId(1L);
 
         // Then
-        assertEquals(1, responses.size());
-        assertEquals(review.getReviewContent(), responses.get(0).getReviewContent());
-        assertEquals(review.getRating(), responses.get(0).getRating());
+        assertEquals(1, responses.getReviewResponseList().size());
+        assertEquals(review.getReviewContent(), responses.getReviewResponseList().get(0).getReviewContent());
+        assertEquals(review.getRating(), responses.getReviewResponseList().get(0).getRating());
     }
 }

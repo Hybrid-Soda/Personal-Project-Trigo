@@ -14,4 +14,10 @@ public class ReviewListResponse {
 
     @Builder.Default
     private List<ReviewResponse> reviewResponseList = new ArrayList<>();
+
+    public static ReviewListResponse of(List<ReviewResponse> reviewResponseList) {
+        return builder()
+                .reviewResponseList(reviewResponseList)
+                .build();
+    }
 }

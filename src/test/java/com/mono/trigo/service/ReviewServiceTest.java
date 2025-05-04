@@ -23,6 +23,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.List;
 import java.util.Optional;
@@ -34,17 +36,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 class ReviewServiceTest {
 
-    @InjectMocks
-    private ReviewService reviewService;
-
-    @Mock
-    private UserHelper userHelper;
-
-    @Mock
-    private ReviewRepository reviewRepository;
-
-    @Mock
-    private ContentRepository contentRepository;
+    @InjectMocks private ReviewService reviewService;
+    @Mock private UserHelper userHelper;
+    @Mock private ReviewRepository reviewRepository;
+    @Mock private ContentRepository contentRepository;
+    @Mock private RedisTemplate<String, Object> redisTemplate;
+    @Mock private ValueOperations<String, Object> valueOps;
 
     private final User user = User.builder().id(1L).username("testUser123").build();
     private final Content content = Content.builder().id(1L).title("Test Content").build();
@@ -101,7 +98,9 @@ class ReviewServiceTest {
     @DisplayName("리뷰 조회 성공")
     void getReviewByContentId_Success() {
         // Given
+        when(redisTemplate.hasKey("contentReviews::" + 1L)).thenReturn(false);
         when(reviewRepository.findByContentId(1L)).thenReturn(List.of(review));
+        when(redisTemplate.opsForValue()).thenReturn(valueOps);
 
         // When
         ReviewListResponse responses = reviewService.getReviewByContentId(1L);
@@ -116,7 +115,9 @@ class ReviewServiceTest {
     @DisplayName("리뷰 조회 성공: 리뷰 없음")
     void getReviewByContentId_Success_Null() {
         // Given
+        when(redisTemplate.hasKey("contentReviews::" + 1L)).thenReturn(false);
         when(reviewRepository.findByContentId(1L)).thenReturn(List.of());
+        when(redisTemplate.opsForValue()).thenReturn(valueOps);
 
         // When
         ReviewListResponse responses = reviewService.getReviewByContentId(1L);

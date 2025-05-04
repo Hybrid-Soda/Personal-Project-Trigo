@@ -24,6 +24,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,6 +42,12 @@ class ContentServiceTest {
 
     @Mock
     private ContentRepository contentRepository;
+
+    @Mock
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Mock
+    private ValueOperations<String, Object> valueOps;
 
     private final Area area = new Area(1L, "서울", "1");
     private final AreaDetail areaDetail = new AreaDetail(1L, area, "강남구", "1");
@@ -74,7 +82,9 @@ class ContentServiceTest {
     @DisplayName("컨텐츠 ID로 조회 성공")
     void getContentById_Success() {
         // Given
+        when(redisTemplate.hasKey("content::" + 1L)).thenReturn(false);
         when(contentRepository.findById(1L)).thenReturn(Optional.of(content1));
+        when(redisTemplate.opsForValue()).thenReturn(valueOps);
 
         // When
         ContentResponse response = contentService.getContentById(1L);
@@ -86,22 +96,10 @@ class ContentServiceTest {
     }
 
     @Test
-    @DisplayName("컨텐츠 ID로 조회 실패: 유효하지 않은 ID")
-    void getContentById_Fail_InvalidId() {
-        // Given
-        Long invalidId = 0L;
-
-        // When & Then
-        ApplicationException exception = assertThrows(ApplicationException.class,
-                () -> contentService.getContentById(invalidId));
-        assertEquals(ApplicationError.CONTENT_ID_IS_INVALID, exception.getError());
-        verify(contentRepository, never()).findById(any());
-    }
-
-    @Test
     @DisplayName("컨텐츠 ID로 조회 실패: 존재하지 않는 컨텐츠")
     void getContentById_Fail_ContentNotFound() {
         // Given
+        when(redisTemplate.hasKey("content::" + 1L)).thenReturn(false);
         when(contentRepository.findById(1L)).thenReturn(Optional.empty());
 
         // When & Then

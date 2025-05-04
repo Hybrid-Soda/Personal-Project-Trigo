@@ -2,6 +2,8 @@ package com.mono.trigo.web.user.controller;
 
 import com.mono.trigo.web.exception.advice.ApplicationException;
 import com.mono.trigo.web.exception.entity.ApplicationError;
+import com.mono.trigo.web.plan.dto.PlanListResponse;
+import com.mono.trigo.web.review.dto.ReviewListResponse;
 import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.user.dto.TokenResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
@@ -62,10 +64,17 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    // 작성한 일정 조회
+    @GetMapping("/{userId}/plans")
+    public ResponseEntity<PlanListResponse> getPlansByUserId(@PathVariable Long userId) {
+        PlanListResponse response = userService.getPlansByUserId(userId);
+        return ResponseEntity.status(200).body(response);
+    }
+
     // 작성한 리뷰 조회
     @GetMapping("/{userId}/reviews")
-    public ResponseEntity<List<ReviewResponse>> getReviewsByUserId(@PathVariable Long userId) {
-        List<ReviewResponse> response = userService.getReviewsByUserId(userId);
+    public ResponseEntity<ReviewListResponse> getReviewsByUserId(@PathVariable Long userId) {
+        ReviewListResponse response = userService.getReviewsByUserId(userId);
         return ResponseEntity.status(200).body(response);
     }
 

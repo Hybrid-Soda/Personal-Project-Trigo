@@ -3,6 +3,7 @@ package com.mono.trigo.controller;
 import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.entity.Gender;
 
+import com.mono.trigo.web.review.dto.ReviewListResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
@@ -151,7 +152,7 @@ public class UserControllerTest {
         // Given
         ReviewResponse review1 = ReviewResponse.builder().reviewId(1L).rating(5).reviewContent("Great place!").build();
         ReviewResponse review2 = ReviewResponse.builder().reviewId(2L).rating(1).reviewContent("pool..").build();
-        List<ReviewResponse> reviews = List.of(review1, review2);
+        ReviewListResponse reviews = ReviewListResponse.of(List.of(review1, review2));
 
         when(userService.getReviewsByUserId(1L)).thenReturn(reviews);
 
@@ -161,11 +162,11 @@ public class UserControllerTest {
         // Then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(2))
-                .andExpect(jsonPath("$[0].reviewId").value(1L))
-                .andExpect(jsonPath("$[0].reviewContent").value("Great place!"))
-                .andExpect(jsonPath("$[1].reviewId").value(2L))
-                .andExpect(jsonPath("$[1].reviewContent").value("pool.."));
+                .andExpect(jsonPath("$.reviewResponseList.length()").value(2))
+                .andExpect(jsonPath("$.reviewResponseList[0].reviewId").value(1L))
+                .andExpect(jsonPath("$.reviewResponseList[0].reviewContent").value("Great place!"))
+                .andExpect(jsonPath("$.reviewResponseList[1].reviewId").value(2L))
+                .andExpect(jsonPath("$.reviewResponseList[1].reviewContent").value("pool.."));
     }
 
     @Test

@@ -1,15 +1,19 @@
 package com.mono.trigo.web.user.service;
 
+import com.mono.trigo.domain.plan.entity.Plan;
+import com.mono.trigo.domain.plan.repository.PlanRepository;
 import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.impl.UserHelper;
 import com.mono.trigo.domain.user.repository.UserRepository;
-
 import com.mono.trigo.domain.review.entity.Review;
 import com.mono.trigo.domain.review.repository.ReviewRepository;
 
 import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.mono.trigo.web.exception.advice.ApplicationException;
 
+import com.mono.trigo.web.plan.dto.PlanListResponse;
+import com.mono.trigo.web.plan.dto.PlanResponse;
+import com.mono.trigo.web.review.dto.ReviewListResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
@@ -31,6 +35,7 @@ public class UserService {
 
     private final UserHelper userHelper;
     private final UserRepository userRepository;
+    private final PlanRepository planRepository;
     private final ReviewRepository reviewRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -82,7 +87,20 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public List<ReviewResponse> getReviewsByUserId(Long userId) {
+    public PlanListResponse getPlansByUserId(Long userId) {
+
+        if (!userRepository.existsById(userId)) {
+            throw new ApplicationException(ApplicationError.USER_IS_NOT_FOUND);
+        }
+
+        List<Plan> plans = planRepository.findByUserId(userId);
+
+        return PlanListResponse.of(plans.stream()
+                .map(PlanResponse::of)
+                .collect(Collectors.toList()));
+    }
+
+    public ReviewListResponse getReviewsByUserId(Long userId) {
 
         if (!userRepository.existsById(userId)) {
             throw new ApplicationException(ApplicationError.USER_IS_NOT_FOUND);
@@ -90,8 +108,8 @@ public class UserService {
 
         List<Review> reviews = reviewRepository.findByUserId(userId);
 
-        return reviews.stream()
+        return ReviewListResponse.of(reviews.stream()
                 .map(ReviewResponse::of)
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
     }
 }
