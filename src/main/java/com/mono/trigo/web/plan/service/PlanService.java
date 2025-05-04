@@ -17,7 +17,9 @@ import com.mono.trigo.web.plan.dto.CreatePlanResponse;
 import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.mono.trigo.web.exception.advice.ApplicationException;
 
+import com.mono.trigo.web.review.dto.ReviewListResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,6 +36,7 @@ public class PlanService {
     private final LikeRepository likeRepository;
     private final ContentRepository contentRepository;
     private final AreaDetailRepository areaDetailRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public CreatePlanResponse createPlan(PlanRequest planRequest) {
 
@@ -69,10 +72,19 @@ public class PlanService {
             throw new ApplicationException(ApplicationError.PLAN_ID_IS_INVALID);
         }
 
+        String redisKey = "plan::" + planId;
+        if (redisTemplate.hasKey(redisKey)) {
+            return (PlanResponse) redisTemplate.opsForValue().get(redisKey);
+        }
+
         Plan plan = planRepository.findById(planId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.PLAN_IS_NOT_FOUND));
+        PlanResponse planResponse = PlanResponse.of(plan);
 
-        return PlanResponse.of(plan);
+        if (plan.getIsPublic()) {
+            redisTemplate.opsForValue().set(redisKey, planResponse);
+        }
+        return planResponse;
     }
 
     public void updatePlan(Long planId, PlanRequest planRequest) {
