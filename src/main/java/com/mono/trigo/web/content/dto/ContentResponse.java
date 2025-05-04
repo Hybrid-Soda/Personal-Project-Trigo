@@ -1,12 +1,10 @@
 package com.mono.trigo.web.content.dto;
 
-import com.mono.trigo.domain.area.entity.AreaDetail;
 import com.mono.trigo.domain.content.entity.Content;
-import com.mono.trigo.domain.content.entity.ContentType;
-
 import lombok.*;
 
 import java.time.LocalDateTime;
+
 
 @Getter
 @Setter

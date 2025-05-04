@@ -5,6 +5,9 @@ import com.mono.trigo.web.content.dto.ContentResponse;
 import com.mono.trigo.web.content.dto.ContentSearchCondition;
 import com.mono.trigo.web.content.service.ContentService;
 import jakarta.annotation.Nullable;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.data.domain.Page;
@@ -41,8 +44,11 @@ public class ContentController {
 
     @GetMapping("/{contentId}")
     @LogExecutionTime
-    public ResponseEntity<ContentResponse> getContentById(@PathVariable Long contentId) {
-        ContentResponse response = contentService.getContentById(contentId);
-        return ResponseEntity.status(200).body(response);
+    public ResponseEntity<ContentResponse> getContentById(
+            @PathVariable @NotNull(message = "contentId는 필수입니다.")
+            @Min(value = 1, message = "contentId는 1 이상의 값이어야 합니다.")
+            Long contentId) {
+                ContentResponse response = contentService.getContentById(contentId);
+                return ResponseEntity.status(200).body(response);
     }
 }

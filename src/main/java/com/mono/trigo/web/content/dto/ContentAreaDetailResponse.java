@@ -1,13 +1,13 @@
 package com.mono.trigo.web.content.dto;
 
 import com.mono.trigo.domain.area.entity.AreaDetail;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ContentAreaDetailResponse {
 
     private String areaName;
