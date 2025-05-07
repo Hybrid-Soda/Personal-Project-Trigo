@@ -28,6 +28,8 @@ import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,23 +42,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 class PlanServiceTest {
 
-    @InjectMocks
-    private PlanService planService;
-
-    @Mock
-    private UserHelper userHelper;
-
-    @Mock
-    private PlanRepository planRepository;
-
-    @Mock
-    private LikeRepository likeRepository;
-
-    @Mock
-    private ContentRepository contentRepository;
-
-    @Mock
-    private AreaDetailRepository areaDetailRepository;
+    @InjectMocks private PlanService planService;
+    @Mock private UserHelper userHelper;
+    @Mock private PlanRepository planRepository;
+    @Mock private LikeRepository likeRepository;
+    @Mock private ContentRepository contentRepository;
+    @Mock private AreaDetailRepository areaDetailRepository;
+    @Mock private RedisTemplate<String, Object> redisTemplate;
+    @Mock private ValueOperations<String, Object> valueOps;
 
     private final User user = User.builder().id(1L).username("testUser123").build();
     private final Area area = new Area(1L, "서울", "1");
@@ -141,7 +134,9 @@ class PlanServiceTest {
     @DisplayName("일정 조회 성공")
     void getPlanById_Success() {
         // Given
+        when(redisTemplate.hasKey("plan::" + 1L)).thenReturn(false);
         when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
+        when(redisTemplate.opsForValue()).thenReturn(valueOps);
 
         // When
         PlanResponse planResponse = planService.getPlanById(1L);

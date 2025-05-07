@@ -1,6 +1,5 @@
 package com.mono.trigo.service;
 
-import com.mono.trigo.common.audit.aop.LogExecutionTime;
 import com.mono.trigo.domain.area.entity.Area;
 import com.mono.trigo.domain.area.entity.AreaDetail;
 import com.mono.trigo.domain.content.entity.Content;
