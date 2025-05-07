@@ -16,6 +16,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -39,7 +40,7 @@ public class ContentService {
     public ContentResponse getContentById(Long contentId) {
 
         String redisKey = "content::" + contentId;
-        if (redisTemplate.hasKey(redisKey)) {
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(redisKey))) {
             return (ContentResponse) redisTemplate.opsForValue().get(redisKey);
         }
 
@@ -47,7 +48,7 @@ public class ContentService {
                 .orElseThrow(() -> new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND));
         ContentResponse contentResponse = ContentResponse.of(content);
 
-        redisTemplate.opsForValue().set(redisKey, contentResponse);
+        redisTemplate.opsForValue().set(redisKey, contentResponse, 2, TimeUnit.HOURS);
         return contentResponse;
     }
 

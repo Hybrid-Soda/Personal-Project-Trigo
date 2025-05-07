@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -52,7 +53,7 @@ public class ReviewService {
     public ReviewListResponse getReviewByContentId(Long contentId) {
 
         String redisKey = "contentReviews::" + contentId;
-        if (redisTemplate.hasKey(redisKey)) {
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(redisKey))) {
             return (ReviewListResponse) redisTemplate.opsForValue().get(redisKey);
         }
 
@@ -62,7 +63,7 @@ public class ReviewService {
                 .map(ReviewResponse::of)
                 .collect(Collectors.toList()));
 
-        redisTemplate.opsForValue().set(redisKey, reviewListResponse);
+        redisTemplate.opsForValue().set(redisKey, reviewListResponse, 2, TimeUnit.HOURS);
         return reviewListResponse;
     }
 

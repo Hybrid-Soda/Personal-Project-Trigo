@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,7 +74,7 @@ public class PlanService {
         }
 
         String redisKey = "plan::" + planId;
-        if (redisTemplate.hasKey(redisKey)) {
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(redisKey))) {
             return (PlanResponse) redisTemplate.opsForValue().get(redisKey);
         }
 
@@ -82,7 +83,7 @@ public class PlanService {
         PlanResponse planResponse = PlanResponse.of(plan);
 
         if (plan.getIsPublic()) {
-            redisTemplate.opsForValue().set(redisKey, planResponse);
+            redisTemplate.opsForValue().set(redisKey, planResponse, 1, TimeUnit.HOURS);
         }
         return planResponse;
     }

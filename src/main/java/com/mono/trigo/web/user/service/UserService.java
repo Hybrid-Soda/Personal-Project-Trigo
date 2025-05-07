@@ -20,12 +20,14 @@ import com.mono.trigo.web.user.dto.SignupRequest;
 import com.mono.trigo.web.review.dto.ReviewResponse;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -38,6 +40,7 @@ public class UserService {
     private final PlanRepository planRepository;
     private final ReviewRepository reviewRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public void signup(SignupRequest signupRequest) {
 
@@ -93,11 +96,18 @@ public class UserService {
             throw new ApplicationException(ApplicationError.USER_IS_NOT_FOUND);
         }
 
-        List<Plan> plans = planRepository.findByUserId(userId);
+        String redisKey = "UserPlans::" + userId;
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(redisKey))) {
+            return (PlanListResponse) redisTemplate.opsForValue().get(redisKey);
+        }
 
-        return PlanListResponse.of(plans.stream()
+        List<Plan> plans = planRepository.findByUserId(userId);
+        PlanListResponse planListResponse = PlanListResponse.of(plans.stream()
                 .map(PlanResponse::of)
                 .collect(Collectors.toList()));
+
+        redisTemplate.opsForValue().set(redisKey, planListResponse, 10, TimeUnit.MINUTES);
+        return planListResponse;
     }
 
     public ReviewListResponse getReviewsByUserId(Long userId) {
@@ -106,10 +116,17 @@ public class UserService {
             throw new ApplicationException(ApplicationError.USER_IS_NOT_FOUND);
         }
 
-        List<Review> reviews = reviewRepository.findByUserId(userId);
+        String redisKey = "UserReviews::" + userId;
+        if (Boolean.TRUE.equals(redisTemplate.hasKey(redisKey))) {
+            return (ReviewListResponse) redisTemplate.opsForValue().get(redisKey);
+        }
 
-        return ReviewListResponse.of(reviews.stream()
+        List<Review> reviews = reviewRepository.findByUserId(userId);
+        ReviewListResponse reviewListResponse = ReviewListResponse.of(reviews.stream()
                 .map(ReviewResponse::of)
                 .collect(Collectors.toList()));
+
+        redisTemplate.opsForValue().set(redisKey, reviewListResponse, 10, TimeUnit.MINUTES);
+        return reviewListResponse;
     }
 }
