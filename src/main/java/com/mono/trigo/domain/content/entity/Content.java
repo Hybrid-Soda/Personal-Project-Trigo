@@ -3,9 +3,13 @@ package com.mono.trigo.domain.content.entity;
 import com.mono.trigo.common.audit.BaseEntity;
 import com.mono.trigo.domain.area.entity.AreaDetail;
 
+import com.mono.trigo.domain.review.entity.Review;
 import com.mono.trigo.openApi.dto.ContentDto;
 import lombok.*;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Getter
@@ -55,6 +59,14 @@ public class Content extends BaseEntity {
 
     @Column(name = "first_image2", length = 512)
     private String firstImage2;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "content", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Review> reviews = new ArrayList<>();
+
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "count_id")
+    private ContentCount contentCount;
 
     public static Content of(ContentDto contentDto, ContentType contentType, AreaDetail areaDetail) {
         return builder()
