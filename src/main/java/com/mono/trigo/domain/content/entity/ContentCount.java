@@ -1,13 +1,24 @@
 package com.mono.trigo.domain.content.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.BatchSize;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@BatchSize(size = 50)
 @Entity(name = "ContentCount")
 public class ContentCount {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "content_id")
-    private Long contentId;
+    private Long id;
 
     @Column(name = "review_count")
     private int reviewCount;

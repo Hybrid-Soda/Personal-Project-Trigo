@@ -64,8 +64,8 @@ public class Content extends BaseEntity {
     @OneToMany(mappedBy = "content", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Review> reviews = new ArrayList<>();
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @JoinColumn(name = "count_id")
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, optional = false)
+    @JoinColumn(name = "content_id", unique = true, nullable = false)
     private ContentCount contentCount;
 
     public static Content of(ContentDto contentDto, ContentType contentType, AreaDetail areaDetail) {

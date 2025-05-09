@@ -1,6 +1,7 @@
 package com.mono.trigo.web.content.dto;
 
 import com.mono.trigo.domain.content.entity.Content;
+import com.mono.trigo.domain.content.entity.ContentCount;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public class ContentResponse {
     private String tel;
     private String firstImage;
     private String firstImage2;
+    private ContentCount contentCount;
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
 
@@ -40,6 +42,7 @@ public class ContentResponse {
                 .tel(content.getTel())
                 .firstImage(content.getFirstImage())
                 .firstImage2(content.getFirstImage2())
+                .contentCount(content.getContentCount())
                 .createdDate(content.getCreatedDate())
                 .modifiedDate(content.getModifiedDate())
                 .build();
