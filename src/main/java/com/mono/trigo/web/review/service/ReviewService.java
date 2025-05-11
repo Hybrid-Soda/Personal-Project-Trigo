@@ -73,8 +73,8 @@ public class ReviewService {
         if (cachedResponse.isPresent()) return cachedResponse.get();
 
         // DB 조회
-        ReviewsResponse reviewsResponse = new ReviewsResponse(
-                contentId, reviewRepository.findByContentId(contentId));
+        ReviewsResponse reviewsResponse =
+                new ReviewsResponse(contentId, reviewRepository.findByContentId(contentId));
 
         // 캐시 저장
         reviewRedisRepository.save(reviewsResponse);
@@ -127,25 +127,25 @@ public class ReviewService {
         contentRedisRepository.deleteById(contentId);
     }
 
-    private void checkUser(User reviewUser) {
+    public void checkUser(User reviewUser) {
         User currentUser = userHelper.getCurrentUser();
         if (!reviewUser.equals(currentUser)) {
             throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
         }
     }
 
-    private void checkReview(Long contentId, Review review) {
+    public void checkReview(Long contentId, Review review) {
         if (!Objects.equals(contentId, review.getContent().getId())) {
             throw new ApplicationException(ApplicationError.REVIEW_IS_NOT_CHILD_OF_CONTENT);
         }
     }
 
-    private Content getContent(Long contentId) {
+    public Content getContent(Long contentId) {
         return contentRepository.findById(contentId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND));
     }
 
-    private Review getReview(Long reviewId) {
+    public Review getReview(Long reviewId) {
         return reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.REVIEW_IS_NOT_FOUND));
     }
