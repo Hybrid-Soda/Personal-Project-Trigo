@@ -15,8 +15,8 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @RedisHash(value = "reviewContent", timeToLive = 60*60*3)
-public class ReviewListResponse implements Serializable {
+public class ReviewsResponse implements Serializable {
 
     @Id @JsonIgnore private Long contentId;
-    private List<ReviewResponse> reviewResponseList = new ArrayList<>();
+    private List<ReviewResponse> reviews = new ArrayList<>();
 }

@@ -1,15 +1,10 @@
 package com.mono.trigo.web.user.controller;
 
-import com.mono.trigo.web.exception.advice.ApplicationException;
-import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.mono.trigo.web.plan.dto.PlanListResponse;
-import com.mono.trigo.web.review.dto.ReviewListResponse;
-import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.user.dto.*;
 import com.mono.trigo.web.user.service.UserService;
 import com.mono.trigo.web.user.service.ReissueService;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -17,8 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Slf4j
 @RestController

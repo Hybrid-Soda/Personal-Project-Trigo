@@ -40,7 +40,7 @@ public class ContentService {
     public ContentResponse getContentById(Long contentId) {
 
         // 캐시 조회
-        Optional<ContentResponse> cachedResponse = contentRedisRepository.findById(String.valueOf(contentId));
+        Optional<ContentResponse> cachedResponse = contentRedisRepository.findById(contentId);
         if (cachedResponse.isPresent()) {
             return cachedResponse.get();
         }

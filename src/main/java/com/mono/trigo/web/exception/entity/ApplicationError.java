@@ -29,12 +29,11 @@ public enum ApplicationError implements ErrorCode {
 
     // review
     REVIEW_IS_NOT_FOUND(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
-    REVIEW_ID_IS_INVALID(HttpStatus.BAD_REQUEST, "리뷰 아이디가 유효하지 않습니다.", HttpStatus.BAD_REQUEST.value()),
+    REVIEW_IS_NOT_CHILD_OF_CONTENT(HttpStatus.BAD_REQUEST, "여행지에 종속된 리뷰가 아닙니다.", HttpStatus.BAD_REQUEST.value()),
 
     // content & area
     CONTENT_IS_NOT_FOUND(HttpStatus.NOT_FOUND, "컨텐츠를 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
     AREA_DETAIL_IS_NOT_FOUND(HttpStatus.NOT_FOUND, "세부 장소를 찾을 수 없습니다.", HttpStatus.NOT_FOUND.value()),
-    CONTENT_ID_IS_INVALID(HttpStatus.BAD_REQUEST, "컨텐츠 아이디가 유효하지 않습니다.", HttpStatus.BAD_REQUEST.value()),
     ;
 
     private final HttpStatus httpStatus;

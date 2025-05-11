@@ -13,7 +13,6 @@ import com.mono.trigo.web.exception.advice.ApplicationException;
 
 import com.mono.trigo.web.plan.dto.PlanListResponse;
 import com.mono.trigo.web.plan.dto.PlanResponse;
-import com.mono.trigo.web.review.dto.ReviewListResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;

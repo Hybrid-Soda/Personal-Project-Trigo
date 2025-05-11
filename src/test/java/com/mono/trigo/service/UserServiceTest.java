@@ -13,7 +13,7 @@ import com.mono.trigo.domain.user.repository.UserRepository;
 import com.mono.trigo.domain.review.repository.ReviewRepository;
 
 import com.mono.trigo.web.plan.dto.PlanListResponse;
-import com.mono.trigo.web.review.dto.ReviewListResponse;
+import com.mono.trigo.web.review.dto.ReviewsResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
@@ -211,7 +211,7 @@ class UserServiceTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOps);
 
         // When
-        ReviewListResponse responses = userService.getReviewsByUserId(1L);
+        ReviewsResponse responses = userService.getReviewsByUserId(1L);
 
         // Then
         assertEquals(1, responses.getReviewResponseList().size());

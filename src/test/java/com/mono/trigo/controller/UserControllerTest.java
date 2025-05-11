@@ -3,7 +3,7 @@ package com.mono.trigo.controller;
 import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.entity.Gender;
 
-import com.mono.trigo.web.review.dto.ReviewListResponse;
+import com.mono.trigo.web.review.dto.ReviewsResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
@@ -11,8 +11,6 @@ import com.mono.trigo.web.user.service.UserService;
 import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.user.service.ReissueService;
 import com.mono.trigo.web.user.controller.UserController;
-import com.mono.trigo.web.exception.entity.ApplicationError;
-import com.mono.trigo.web.exception.advice.ApplicationException;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -152,7 +150,7 @@ public class UserControllerTest {
         // Given
         ReviewResponse review1 = ReviewResponse.builder().reviewId(1L).rating(5).reviewContent("Great place!").build();
         ReviewResponse review2 = ReviewResponse.builder().reviewId(2L).rating(1).reviewContent("pool..").build();
-        ReviewListResponse reviews = ReviewListResponse.of(List.of(review1, review2));
+        ReviewsResponse reviews = new ReviewsResponse(List.of(review1, review2));
 
         when(userService.getReviewsByUserId(1L)).thenReturn(reviews);
 

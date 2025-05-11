@@ -17,7 +17,6 @@ import com.mono.trigo.web.plan.dto.CreatePlanResponse;
 import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.mono.trigo.web.exception.advice.ApplicationException;
 
-import com.mono.trigo.web.review.dto.ReviewListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;

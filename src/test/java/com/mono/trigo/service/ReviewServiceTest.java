@@ -7,9 +7,8 @@ import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.review.repository.ReviewRepository;
 import com.mono.trigo.domain.content.repository.ContentRepository;
 
-import com.mono.trigo.web.review.dto.ReviewListResponse;
+import com.mono.trigo.web.review.dto.ReviewsResponse;
 import com.mono.trigo.web.review.dto.ReviewRequest;
-import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.review.service.ReviewService;
 import com.mono.trigo.web.review.dto.CreateReviewResponse;
 import com.mono.trigo.web.exception.entity.ApplicationError;
@@ -103,7 +102,7 @@ class ReviewServiceTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOps);
 
         // When
-        ReviewListResponse responses = reviewService.getReviewByContentId(1L);
+        ReviewsResponse responses = reviewService.getReviewByContentId(1L);
 
         // Then
         assertEquals(1, responses.getReviewResponseList().size());
@@ -120,7 +119,7 @@ class ReviewServiceTest {
         when(redisTemplate.opsForValue()).thenReturn(valueOps);
 
         // When
-        ReviewListResponse responses = reviewService.getReviewByContentId(1L);
+        ReviewsResponse responses = reviewService.getReviewByContentId(1L);
 
         // Then
         assertEquals(0, responses.getReviewResponseList().size());
@@ -182,7 +181,7 @@ class ReviewServiceTest {
         when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
 
         // When
-        reviewService.deleteReview(1L);
+        reviewService.deleteReview(1L, 1L);
 
         // Then
         verify(reviewRepository, times(1)).deleteById(1L);
