@@ -19,6 +19,7 @@ import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
 import com.mono.trigo.web.review.dto.ReviewResponse;
 
+import com.mono.trigo.web.user.dto.UserReviewsResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -110,7 +111,7 @@ public class UserService {
         return planListResponse;
     }
 
-    public ReviewListResponse getReviewsByUserId(Long userId) {
+    public UserReviewsResponse getReviewsByUserId(Long userId) {
 
         if (!userRepository.existsById(userId)) {
             throw new ApplicationException(ApplicationError.USER_IS_NOT_FOUND);
@@ -118,15 +119,15 @@ public class UserService {
 
         String redisKey = "UserReviews::" + userId;
         if (Boolean.TRUE.equals(redisTemplate.hasKey(redisKey))) {
-            return (ReviewListResponse) redisTemplate.opsForValue().get(redisKey);
+            return (UserReviewsResponse) redisTemplate.opsForValue().get(redisKey);
         }
 
         List<Review> reviews = reviewRepository.findByUserId(userId);
-        ReviewListResponse reviewListResponse = ReviewListResponse.of(reviews.stream()
+        UserReviewsResponse userReviewsResponse = new UserReviewsResponse(reviews.stream()
                 .map(ReviewResponse::of)
                 .collect(Collectors.toList()));
 
-        redisTemplate.opsForValue().set(redisKey, reviewListResponse, 10, TimeUnit.MINUTES);
-        return reviewListResponse;
+        redisTemplate.opsForValue().set(redisKey, userReviewsResponse, 10, TimeUnit.MINUTES);
+        return userReviewsResponse;
     }
 }

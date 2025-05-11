@@ -6,45 +6,46 @@ import com.mono.trigo.domain.review.entity.Review;
 import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.review.repository.ReviewRepository;
 import com.mono.trigo.domain.content.repository.ContentRepository;
+import com.mono.trigo.domain.review.repository.ReviewRedisRepository;
 
-import com.mono.trigo.web.content.dto.ContentResponse;
-import com.mono.trigo.web.review.dto.ReviewListResponse;
 import com.mono.trigo.web.review.dto.ReviewRequest;
-import com.mono.trigo.web.review.dto.ReviewResponse;
+import com.mono.trigo.web.review.dto.ReviewListResponse;
 import com.mono.trigo.web.review.dto.CreateReviewResponse;
 
 import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.mono.trigo.web.exception.advice.ApplicationException;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
-import static com.mono.trigo.domain.review.entity.QReview.review;
+import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
 public class ReviewService {
 
+    private final UserHelper userHelper;
     private final ReviewRepository reviewRepository;
     private final ContentRepository contentRepository;
-    private final UserHelper userHelper;
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final ReviewRedisRepository reviewRedisRepository;
 
+    public ReviewService(
+            UserHelper userHelper,
+            ReviewRepository reviewRepository,
+            ContentRepository contentRepository,
+            ReviewRedisRepository reviewRedisRepository
+    ) {
+        this.userHelper = userHelper;
+        this.reviewRepository = reviewRepository;
+        this.contentRepository = contentRepository;
+        this.reviewRedisRepository = reviewRedisRepository;
+    }
+
+    // 리뷰 생성
     @Transactional
     public CreateReviewResponse createReview(Long contentId, ReviewRequest reviewRequest) {
 
-        Content content = getContent(contentId);
         User user = userHelper.getCurrentUser();
-        if (user == null) {
-            throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
-        }
+        Content content = getContent(contentId);
 
         // 리뷰 생성
         Review review = Review.of(reviewRequest, content, user);
@@ -58,69 +59,63 @@ public class ReviewService {
         return CreateReviewResponse.of(savedReview.getId());
     }
 
+    // 리뷰 리스트 조회
     public ReviewListResponse getReviewByContentId(Long contentId) {
 
-        String redisKey = "contentReviews::" + contentId;
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(redisKey))) {
-            return (ReviewListResponse) redisTemplate.opsForValue().get(redisKey);
+        // 캐시 조회
+        Optional<ReviewListResponse> cachedResponse = reviewRedisRepository.findById(String.valueOf(contentId));
+        if (cachedResponse.isPresent()) {
+            return cachedResponse.get();
         }
 
-        List<Review> reviews = reviewRepository.findByContentId(contentId);
-        ReviewListResponse reviewListResponse = new ReviewListResponse(reviews
-                .stream()
-                .map(ReviewResponse::of)
-                .collect(Collectors.toList()));
+        // DB 조회
+        ReviewListResponse reviewListResponse =
+                new ReviewListResponse(contentId, reviewRepository.findByContentId(contentId));
 
-        redisTemplate.opsForValue().set(redisKey, reviewListResponse, 2, TimeUnit.HOURS);
+        // 캐시 저장
+        reviewRedisRepository.save(reviewListResponse);
         return reviewListResponse;
     }
 
+    // 리뷰 수정
     @Transactional
     public void updateReview(Long contentId, Long reviewId, ReviewRequest reviewRequest) {
 
-        checkReviewId(reviewId);
-        Content content = getContent(contentId);
         Review review = getReview(reviewId);
-        checkUser(review);
+        checkUser(review.getUser());
 
-        // 리뷰 업데이트
+        // 리뷰 수정
         review.updateReview(reviewRequest);
         reviewRepository.save(review);
 
-        // 컨텐츠 별점 업데이트
+        // 컨텐츠 별점 수정
+        Content content = getContent(contentId);
         content.getContentCount().setAverageScore(reviewRequest.getRating());
         contentRepository.save(content);
 
         // 캐시 제거
-        deleteCache(contentId);
     }
 
+    // 리뷰 삭제
     @Transactional
     public void deleteReview(Long contentId, Long reviewId) {
 
-        checkReviewId(reviewId);
-        Content content = getContent(contentId);
-        Review review = getReview(reviewId);
-        checkUser(review);
-
         // 리뷰 삭제
+        Review review = getReview(reviewId);
+        checkUser(review.getUser());
         reviewRepository.deleteById(reviewId);
-        deleteCache(contentId);
 
         // 컨텐츠 리뷰 카운트
+        Content content = getContent(contentId);
         content.getContentCount().minusReview(review.getRating());
         contentRepository.save(content);
+
+        // 캐시 제거
     }
 
-    private void checkReviewId(Long reviewId) {
-        if (reviewId == null || reviewId <= 0) {
-            throw new ApplicationException(ApplicationError.REVIEW_ID_IS_INVALID);
-        }
-    }
-
-    private void checkUser(Review review) {
+    private void checkUser(User reviewUser) {
         User currentUser = userHelper.getCurrentUser();
-        if (!review.getUser().equals(currentUser)) {
+        if (!reviewUser.equals(currentUser)) {
             throw new ApplicationException(ApplicationError.UNAUTHORIZED_ACCESS);
         }
     }
@@ -133,12 +128,5 @@ public class ReviewService {
     private Review getReview(Long reviewId) {
         return reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ApplicationException(ApplicationError.REVIEW_IS_NOT_FOUND));
-    }
-
-    private void deleteCache(Long contentId) {
-        String redisKey = "contentReviews::" + contentId;
-        if (Boolean.TRUE.equals(redisTemplate.hasKey(redisKey))) {
-            redisTemplate.opsForValue().getAndDelete(redisKey);
-        }
     }
 }

@@ -1,6 +1,5 @@
 package com.mono.trigo.web.content.service;
 
-import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.content.repository.ContentRedisRepository;
 import com.mono.trigo.domain.content.repository.ContentRepository;
 
@@ -14,7 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 @Service
 public class ContentService {
@@ -33,10 +31,9 @@ public class ContentService {
 
     // 여행지 목록 조회
     public Page<ContentResponse> searchContents(ContentSearchCondition condition, Integer numOfRows, Integer pageNo) {
-        PageRequest pageRequest = createPageRequest(pageNo, numOfRows);
 
-        return contentRepository.searchContents(condition, pageRequest)
-                                .map(ContentResponse::of);
+        PageRequest pageRequest = createPageRequest(pageNo, numOfRows);
+        return contentRepository.searchContents(condition, pageRequest).map(ContentResponse::of);
     }
 
     // 여행지 상세 조회

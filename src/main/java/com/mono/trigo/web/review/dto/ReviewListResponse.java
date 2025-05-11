@@ -1,23 +1,22 @@
 package com.mono.trigo.web.review.dto;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.util.ArrayList;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
+
+import lombok.*;
 import java.util.List;
+import java.util.ArrayList;
+import java.io.Serializable;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReviewListResponse {
+@RedisHash(value = "reviewContent", timeToLive = 60*60*3)
+public class ReviewListResponse implements Serializable {
 
-    @Builder.Default
+    @Id @JsonIgnore private Long contentId;
     private List<ReviewResponse> reviewResponseList = new ArrayList<>();
-
-    public static ReviewListResponse of(List<ReviewResponse> reviewResponseList) {
-        return builder()
-                .reviewResponseList(reviewResponseList)
-                .build();
-    }
 }
