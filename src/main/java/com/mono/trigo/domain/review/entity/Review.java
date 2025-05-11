@@ -48,4 +48,10 @@ public class Review extends BaseEntity {
                 .pictureList(reviewRequest.getPictureList())
                 .build();
     }
+
+    public void updateReview(ReviewRequest reviewRequest) {
+        this.rating = reviewRequest.getRating();
+        this.reviewContent = reviewRequest.getReviewContent();
+        this.pictureList = reviewRequest.getPictureList();
+    }
 }

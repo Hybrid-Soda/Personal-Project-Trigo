@@ -2,21 +2,23 @@ package com.mono.trigo.web.content.dto;
 
 import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.content.entity.ContentCount;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
-
 
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ContentResponse {
+@RedisHash(value = "content", timeToLive = 60*60*3)
+public class ContentResponse implements Serializable {
 
-    private Long id;
+    @Id private Long id;
     private String contentType;
-    private ContentAreaDetailResponse contentAreaDetailResponse;
     private String title;
     private Double mapX;
     private Double mapY;
@@ -25,9 +27,9 @@ public class ContentResponse {
     private String tel;
     private String firstImage;
     private String firstImage2;
-    private ContentCount contentCount;
-    private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
+    private ContentCount contentCount;
+    private ContentAreaDetailResponse contentAreaDetailResponse;
 
     public static ContentResponse of(Content content) {
         return builder()
@@ -43,7 +45,6 @@ public class ContentResponse {
                 .firstImage(content.getFirstImage())
                 .firstImage2(content.getFirstImage2())
                 .contentCount(content.getContentCount())
-                .createdDate(content.getCreatedDate())
                 .modifiedDate(content.getModifiedDate())
                 .build();
     }

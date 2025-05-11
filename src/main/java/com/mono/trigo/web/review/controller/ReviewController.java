@@ -48,15 +48,19 @@ public class ReviewController {
     // 리뷰 수정
     @PutMapping("/{reviewId}")
     public ResponseEntity<String> updateReview(
-            @PathVariable Long reviewId, @Valid @RequestBody ReviewRequest reviewRequest) {
-        reviewService.updateReview(reviewId, reviewRequest);
+            @PathVariable Long contentId,
+            @PathVariable Long reviewId,
+            @Valid @RequestBody ReviewRequest reviewRequest) {
+        reviewService.updateReview(contentId, reviewId, reviewRequest);
         return ResponseEntity.status(200).body("Review updated successfully");
     }
 
     // 리뷰 삭제
-    @DeleteMapping("{reviewId}")
-    public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId) {
-        reviewService.deleteReview(reviewId);
+    @DeleteMapping("/{reviewId}")
+    public ResponseEntity<Void> deleteReview(
+            @PathVariable Long contentId,
+            @PathVariable Long reviewId) {
+        reviewService.deleteReview(contentId, reviewId);
         return ResponseEntity.noContent().build();
     }
 }

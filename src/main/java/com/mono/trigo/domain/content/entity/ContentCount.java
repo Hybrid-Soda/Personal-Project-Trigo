@@ -29,17 +29,17 @@ public class ContentCount {
     // 리뷰수 증가
     public void plusReview(int newScore) {
         this.reviewCount++;
-        getAverageScore(newScore);
+        setAverageScore(newScore);
     }
 
     // 리뷰수 감소
     public void minusReview(int newScore) {
         this.reviewCount++;
-        getAverageScore(newScore);
+        setAverageScore(newScore);
     }
 
     // 평균 스코어 구하기 (증분 평균 계산)
-    public void getAverageScore(int newScore) {
+    public void setAverageScore(int newScore) {
         this.averageScore += (newScore - this.averageScore) / this.reviewCount;
     }
 }
