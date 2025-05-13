@@ -3,7 +3,6 @@ package com.mono.trigo.controller;
 import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.entity.Gender;
 
-import com.mono.trigo.web.review.dto.ReviewsResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;

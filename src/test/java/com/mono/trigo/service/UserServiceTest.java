@@ -5,18 +5,18 @@ import com.mono.trigo.domain.area.entity.AreaDetail;
 import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.plan.entity.Plan;
 import com.mono.trigo.domain.plan.repository.PlanRepository;
+import com.mono.trigo.domain.review.entity.Review;
 import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.entity.Gender;
 import com.mono.trigo.domain.user.impl.UserHelper;
-import com.mono.trigo.domain.review.entity.Review;
 import com.mono.trigo.domain.user.repository.UserRepository;
 import com.mono.trigo.domain.review.repository.ReviewRepository;
 
 import com.mono.trigo.web.plan.dto.PlanListResponse;
-import com.mono.trigo.web.review.dto.ReviewsResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
+import com.mono.trigo.web.user.dto.UserReviewsResponse;
 import com.mono.trigo.web.user.service.UserService;
 import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.mono.trigo.web.exception.advice.ApplicationException;
@@ -51,8 +51,6 @@ class UserServiceTest {
     @Mock private PlanRepository planRepository;
     @Mock private ReviewRepository reviewRepository;
     @Mock private BCryptPasswordEncoder bCryptPasswordEncoder;
-    @Mock private RedisTemplate<String, Object> redisTemplate;
-    @Mock private ValueOperations<String, Object> valueOps;
 
     private User user;
     private SignupRequest request;
@@ -171,18 +169,11 @@ class UserServiceTest {
         // Given
         AreaDetail areaDetail = new AreaDetail(1L, new Area(), "name1", "A101");
         Plan plan = Plan.builder()
-                .id(1L)
-                .user(user)
-                .title("title1")
-                .contents(new ArrayList<>())
-                .areaDetail(areaDetail)
-                .isPublic(true)
+                .id(1L).user(user).title("title1").contents(new ArrayList<>()).areaDetail(areaDetail).isPublic(true)
                 .build();
 
-        when(redisTemplate.hasKey("UserPlans::" + 1L)).thenReturn(false);
         when(userRepository.existsById(1L)).thenReturn(true);
         when(planRepository.findByUserId(1L)).thenReturn(List.of(plan));
-        when(redisTemplate.opsForValue()).thenReturn(valueOps);
 
         // When
         PlanListResponse responses = userService.getPlansByUserId(1L);
@@ -193,29 +184,23 @@ class UserServiceTest {
         assertEquals(plan.getIsPublic(), responses.getPlanResponseList().get(0).getIsPublic());
     }
 
-//    @Test
-//    @DisplayName("작성한 리뷰 조회 성공")
-//    void getReviewsByUserId_Success() {
-//        // Given
-//        Review review = Review.builder()
-//                .id(1L)
-//                .user(user)
-//                .content(new Content())
-//                .rating(5)
-//                .reviewContent("Great place!")
-//                .build();
-//
-//        when(redisTemplate.hasKey("UserReviews::" + 1L)).thenReturn(false);
-//        when(userRepository.existsById(1L)).thenReturn(true);
-//        when(reviewRepository.findByUserId(1L)).thenReturn(List.of(review));
-//        when(redisTemplate.opsForValue()).thenReturn(valueOps);
-//
-//        // When
-//        ReviewsResponse responses = userService.getReviewsByUserId(1L);
-//
-//        // Then
-//        assertEquals(1, responses.getReviewResponseList().size());
-//        assertEquals(review.getReviewContent(), responses.getReviewResponseList().get(0).getReviewContent());
-//        assertEquals(review.getRating(), responses.getReviewResponseList().get(0).getRating());
-//    }
+    @Test
+    @DisplayName("작성한 리뷰 조회 성공")
+    void getReviewsByUserId_Success() {
+        // Given
+        Review review = Review.builder()
+                .id(1L).user(user).content(new Content()).rating(5).reviewContent("Great place!")
+                .build();
+
+        when(userRepository.existsById(1L)).thenReturn(true);
+        when(reviewRepository.findByUserId(1L)).thenReturn(List.of(review));
+
+        // When
+        UserReviewsResponse response = userService.getReviewsByUserId(1L);
+
+        // Then
+        assertEquals(1, response.getReviews().size());
+        assertEquals(review.getReviewContent(), response.getReviews().get(0).getReviewContent());
+        assertEquals(review.getRating(), response.getReviews().get(0).getRating());
+    }
 }

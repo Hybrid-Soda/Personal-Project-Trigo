@@ -10,7 +10,7 @@ import com.mono.trigo.domain.review.repository.ReviewRedisRepository;
 import com.mono.trigo.domain.content.repository.ContentRedisRepository;
 
 import com.mono.trigo.web.review.dto.ReviewRequest;
-import com.mono.trigo.web.review.dto.ReviewsResponse;
+import com.mono.trigo.web.review.dto.ContentReviewsResponse;
 import com.mono.trigo.web.review.dto.CreateReviewResponse;
 
 import com.mono.trigo.web.exception.entity.ApplicationError;
@@ -66,19 +66,19 @@ public class ReviewService {
     }
 
     // 리뷰 리스트 조회
-    public ReviewsResponse getReviewByContentId(Long contentId) {
+    public ContentReviewsResponse getReviewByContentId(Long contentId) {
 
         // 캐시 조회
-        Optional<ReviewsResponse> cachedResponse = reviewRedisRepository.findById(contentId);
+        Optional<ContentReviewsResponse> cachedResponse = reviewRedisRepository.findById(contentId);
         if (cachedResponse.isPresent()) return cachedResponse.get();
 
         // DB 조회
-        ReviewsResponse reviewsResponse =
-                new ReviewsResponse(contentId, reviewRepository.findByContentId(contentId));
+        ContentReviewsResponse contentReviewsResponse =
+                new ContentReviewsResponse(contentId, reviewRepository.findByContentId(contentId));
 
         // 캐시 저장
-        reviewRedisRepository.save(reviewsResponse);
-        return reviewsResponse;
+        reviewRedisRepository.save(contentReviewsResponse);
+        return contentReviewsResponse;
     }
 
     // 리뷰 수정

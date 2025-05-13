@@ -11,7 +11,7 @@ import com.mono.trigo.domain.review.repository.ReviewRedisRepository;
 import com.mono.trigo.domain.content.repository.ContentRedisRepository;
 
 import com.mono.trigo.web.review.dto.ReviewResponse;
-import com.mono.trigo.web.review.dto.ReviewsResponse;
+import com.mono.trigo.web.review.dto.ContentReviewsResponse;
 import com.mono.trigo.web.review.dto.ReviewRequest;
 import com.mono.trigo.web.review.service.ReviewService;
 import com.mono.trigo.web.review.dto.CreateReviewResponse;
@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -72,7 +71,7 @@ class ReviewServiceTest {
     private final ReviewResponse response1 = ReviewResponse.of(review1);
     private final ReviewResponse response2 = ReviewResponse.of(review2);
     private final List<ReviewResponse> ReviewResponseList =  List.of(response1, response2);
-    private final ReviewsResponse reviewsResponse = new ReviewsResponse(content.getId(), ReviewResponseList);
+    private final ContentReviewsResponse contentReviewsResponse = new ContentReviewsResponse(content.getId(), ReviewResponseList);
 
     @Test
     @DisplayName("리뷰 생성 성공")
@@ -111,13 +110,13 @@ class ReviewServiceTest {
     @DisplayName("리뷰 조회 성공: 캐시 히트")
     void getReviewByContentId_CacheHit() {
         // Given
-        when(reviewRedisRepository.findById(contentId)).thenReturn(Optional.of(reviewsResponse));
+        when(reviewRedisRepository.findById(contentId)).thenReturn(Optional.of(contentReviewsResponse));
 
         // When
-        ReviewsResponse result = reviewService.getReviewByContentId(contentId);
+        ContentReviewsResponse result = reviewService.getReviewByContentId(contentId);
 
         // Then
-        assertThat(result).isEqualTo(reviewsResponse);
+        assertThat(result).isEqualTo(contentReviewsResponse);
         verify(reviewRedisRepository, times(1)).findById(contentId);
         verifyNoInteractions(reviewRepository);
     }
@@ -130,7 +129,7 @@ class ReviewServiceTest {
         when(reviewRepository.findByContentId(contentId)).thenReturn(ReviewResponseList);
 
         // When
-        ReviewsResponse responses = reviewService.getReviewByContentId(contentId);
+        ContentReviewsResponse responses = reviewService.getReviewByContentId(contentId);
 
         // Then
         assertEquals(2, responses.getReviews().size());
@@ -147,7 +146,7 @@ class ReviewServiceTest {
         when(reviewRepository.findByContentId(contentId)).thenReturn(List.of());
 
         // When
-        ReviewsResponse responses = reviewService.getReviewByContentId(contentId);
+        ContentReviewsResponse responses = reviewService.getReviewByContentId(contentId);
 
         // Then
         assertEquals(0, responses.getReviews().size());

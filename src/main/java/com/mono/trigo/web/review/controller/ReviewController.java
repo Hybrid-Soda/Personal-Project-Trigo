@@ -1,6 +1,6 @@
 package com.mono.trigo.web.review.controller;
 
-import com.mono.trigo.web.review.dto.ReviewsResponse;
+import com.mono.trigo.web.review.dto.ContentReviewsResponse;
 import com.mono.trigo.web.review.dto.ReviewRequest;
 import com.mono.trigo.web.review.service.ReviewService;
 import com.mono.trigo.web.review.dto.CreateReviewResponse;
@@ -34,11 +34,11 @@ public class ReviewController {
 
     // 콘텐츠 별 리뷰 조회
     @GetMapping
-    public ResponseEntity<ReviewsResponse> getReviewByContentId(
+    public ResponseEntity<ContentReviewsResponse> getReviewByContentId(
             @PathVariable @Min(1) Long contentId
     ) {
 
-        ReviewsResponse response = reviewService.getReviewByContentId(contentId);
+        ContentReviewsResponse response = reviewService.getReviewByContentId(contentId);
         return ResponseEntity.status(200).body(response);
     }
 

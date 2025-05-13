@@ -15,5 +15,5 @@ import java.util.List;
 @AllArgsConstructor
 public class UserReviewsResponse {
 
-    private List<ReviewResponse> reviewResponseList = new ArrayList<>();
+    private List<ReviewResponse> reviews = new ArrayList<>();
 }
