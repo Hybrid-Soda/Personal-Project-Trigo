@@ -41,9 +41,7 @@ public class ContentService {
 
         // 캐시 조회
         Optional<ContentResponse> cachedResponse = contentRedisRepository.findById(contentId);
-        if (cachedResponse.isPresent()) {
-            return cachedResponse.get();
-        }
+        if (cachedResponse.isPresent()) return cachedResponse.get();
 
         // DB 조회
         ContentResponse contentResponse = ContentResponse.of(contentRepository.findById(contentId)

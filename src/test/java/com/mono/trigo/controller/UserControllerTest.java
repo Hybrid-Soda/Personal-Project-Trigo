@@ -7,6 +7,7 @@ import com.mono.trigo.web.review.dto.ReviewsResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
+import com.mono.trigo.web.user.dto.UserReviewsResponse;
 import com.mono.trigo.web.user.service.UserService;
 import com.mono.trigo.web.review.dto.ReviewResponse;
 import com.mono.trigo.web.user.service.ReissueService;
@@ -44,17 +45,12 @@ import java.util.List;
 @ExtendWith(MockitoExtension.class)
 public class UserControllerTest {
 
-    @InjectMocks
-    private UserController userController;
+    @InjectMocks private UserController userController;
+    @Mock private UserService userService;
+    @Mock private ReissueService reissueService;
 
-    @Mock
-    private UserService userService;
-
-    @Mock
-    private ReissueService reissueService;
-
-    private MockMvc mockMvc;
     private User user;
+    private MockMvc mockMvc;
     private SignupRequest signupRequest;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -150,8 +146,7 @@ public class UserControllerTest {
         // Given
         ReviewResponse review1 = ReviewResponse.builder().reviewId(1L).rating(5).reviewContent("Great place!").build();
         ReviewResponse review2 = ReviewResponse.builder().reviewId(2L).rating(1).reviewContent("pool..").build();
-        ReviewsResponse reviews = new ReviewsResponse(List.of(review1, review2));
-
+        UserReviewsResponse reviews = new UserReviewsResponse(List.of(review1, review2));
         when(userService.getReviewsByUserId(1L)).thenReturn(reviews);
 
         // When

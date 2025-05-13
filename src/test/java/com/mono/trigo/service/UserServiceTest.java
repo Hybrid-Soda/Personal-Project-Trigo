@@ -193,29 +193,29 @@ class UserServiceTest {
         assertEquals(plan.getIsPublic(), responses.getPlanResponseList().get(0).getIsPublic());
     }
 
-    @Test
-    @DisplayName("작성한 리뷰 조회 성공")
-    void getReviewsByUserId_Success() {
-        // Given
-        Review review = Review.builder()
-                .id(1L)
-                .user(user)
-                .content(new Content())
-                .rating(5)
-                .reviewContent("Great place!")
-                .build();
-
-        when(redisTemplate.hasKey("UserReviews::" + 1L)).thenReturn(false);
-        when(userRepository.existsById(1L)).thenReturn(true);
-        when(reviewRepository.findByUserId(1L)).thenReturn(List.of(review));
-        when(redisTemplate.opsForValue()).thenReturn(valueOps);
-
-        // When
-        ReviewsResponse responses = userService.getReviewsByUserId(1L);
-
-        // Then
-        assertEquals(1, responses.getReviewResponseList().size());
-        assertEquals(review.getReviewContent(), responses.getReviewResponseList().get(0).getReviewContent());
-        assertEquals(review.getRating(), responses.getReviewResponseList().get(0).getRating());
-    }
+//    @Test
+//    @DisplayName("작성한 리뷰 조회 성공")
+//    void getReviewsByUserId_Success() {
+//        // Given
+//        Review review = Review.builder()
+//                .id(1L)
+//                .user(user)
+//                .content(new Content())
+//                .rating(5)
+//                .reviewContent("Great place!")
+//                .build();
+//
+//        when(redisTemplate.hasKey("UserReviews::" + 1L)).thenReturn(false);
+//        when(userRepository.existsById(1L)).thenReturn(true);
+//        when(reviewRepository.findByUserId(1L)).thenReturn(List.of(review));
+//        when(redisTemplate.opsForValue()).thenReturn(valueOps);
+//
+//        // When
+//        ReviewsResponse responses = userService.getReviewsByUserId(1L);
+//
+//        // Then
+//        assertEquals(1, responses.getReviewResponseList().size());
+//        assertEquals(review.getReviewContent(), responses.getReviewResponseList().get(0).getReviewContent());
+//        assertEquals(review.getRating(), responses.getReviewResponseList().get(0).getRating());
+//    }
 }

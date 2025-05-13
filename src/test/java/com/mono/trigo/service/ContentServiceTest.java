@@ -4,7 +4,9 @@ import com.mono.trigo.domain.area.entity.Area;
 import com.mono.trigo.domain.area.entity.AreaDetail;
 import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.content.entity.ContentType;
+import com.mono.trigo.domain.content.entity.ContentCount;
 import com.mono.trigo.domain.content.repository.ContentRepository;
+import com.mono.trigo.domain.content.repository.ContentRedisRepository;
 
 import com.mono.trigo.web.content.dto.ContentResponse;
 import com.mono.trigo.web.content.service.ContentService;
@@ -23,12 +25,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -39,22 +41,21 @@ class ContentServiceTest {
     @InjectMocks
     private ContentService contentService;
 
-    @Mock
-    private ContentRepository contentRepository;
+    @Mock private ContentRepository contentRepository;
+    @Mock private ContentRedisRepository contentRedisRepository;
 
-    @Mock
-    private RedisTemplate<String, Object> redisTemplate;
-
-    @Mock
-    private ValueOperations<String, Object> valueOps;
-
+    private final Long contentId = 1L;
     private final Area area = new Area(1L, "서울", "1");
     private final AreaDetail areaDetail = new AreaDetail(1L, area, "강남구", "1");
     private final ContentType contentType = new ContentType("A0101", "A01010001", "type1");
-    private final Content content1 =
-            new Content(1L, contentType, areaDetail, "content1", 10.0, 10.0, "add1", "", "", "", "");
-    private final Content content2 =
-            new Content(2L, contentType, areaDetail, "content2", 20.0, 20.0, "add1", "", "", "", "");
+    private  final ContentCount contentCount = new ContentCount(contentId, 1, 4.0f);
+    private final Content content1 = Content.builder()
+            .id(contentId).contentType(contentType).areaDetail(areaDetail).contentCount(contentCount)
+            .build();
+    private final Content content2 = Content.builder()
+            .id(2L).contentType(contentType).areaDetail(areaDetail).contentCount(contentCount)
+            .build();
+    private final ContentResponse contentResponse = ContentResponse.of(content1);
 
     @Test
     @DisplayName("컨텐츠 검색 성공")
@@ -78,32 +79,46 @@ class ContentServiceTest {
     }
 
     @Test
-    @DisplayName("컨텐츠 ID로 조회 성공")
-    void getContentById_Success() {
+    @DisplayName("컨텐츠 ID 조회 성공: 캐시 히트")
+    void getContentById_Success_CacheHit() {
         // Given
-        when(redisTemplate.hasKey("content::" + 1L)).thenReturn(false);
-        when(contentRepository.findById(1L)).thenReturn(Optional.of(content1));
-        when(redisTemplate.opsForValue()).thenReturn(valueOps);
+        Long contentId = content1.getId();
+        when(contentRedisRepository.findById(contentId)).thenReturn(Optional.of(contentResponse));
 
         // When
-        ContentResponse response = contentService.getContentById(1L);
+        ContentResponse response = contentService.getContentById(contentId);
 
         // Then
-        assertEquals(content1.getId(), response.getId());
-        assertEquals(content1.getTitle(), response.getTitle());
-        verify(contentRepository, times(1)).findById(1L);
+        assertThat(response).isEqualTo(contentResponse);
+        verify(contentRedisRepository, times(1)).findById(contentId);
+        verifyNoInteractions(contentRepository);
     }
 
     @Test
-    @DisplayName("컨텐츠 ID로 조회 실패: 존재하지 않는 컨텐츠")
+    @DisplayName("컨텐츠 ID 조회 성공: 캐시 미스 후 DB 조회")
+    void getContentById_Success_DB() {
+        // Given
+        when(contentRedisRepository.findById(contentId)).thenReturn(Optional.empty());
+        when(contentRepository.findById(contentId)).thenReturn(Optional.of(content1));
+
+        // When
+        ContentResponse response = contentService.getContentById(contentId);
+
+        // Then
+        assertThat(response.getId()).isEqualTo(contentResponse.getId());
+        verify(contentRepository, times(1)).findById(contentId);
+    }
+
+    @Test
+    @DisplayName("컨텐츠 ID 조회 실패: 존재하지 않는 컨텐츠")
     void getContentById_Fail_ContentNotFound() {
         // Given
-        when(redisTemplate.hasKey("content::" + 1L)).thenReturn(false);
-        when(contentRepository.findById(1L)).thenReturn(Optional.empty());
+        when(contentRedisRepository.findById(contentId)).thenReturn(Optional.empty());
+        when(contentRepository.findById(contentId)).thenReturn(Optional.empty());
 
         // When & Then
         ApplicationException exception =
-                assertThrows(ApplicationException.class, () -> contentService.getContentById(1L));
+                assertThrows(ApplicationException.class, () -> contentService.getContentById(contentId));
         assertEquals(ApplicationError.CONTENT_IS_NOT_FOUND, exception.getError());
     }
 }
