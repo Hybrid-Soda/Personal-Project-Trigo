@@ -1,10 +1,12 @@
 package com.mono.trigo.web.plan.dto;
 
-import com.mono.trigo.domain.area.entity.AreaDetail;
 import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.plan.entity.Plan;
 import com.mono.trigo.web.content.dto.ContentAreaDetailResponse;
+
 import lombok.*;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -16,9 +18,10 @@ import java.util.stream.Collectors;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@RedisHash(value = "plan", timeToLive = 60*60*2)
 public class PlanResponse {
 
-    private Long planId; // 일정 ID
+    @Id private Long planId; // 일정 ID
     private Long userId; // 유저 ID
     private ContentAreaDetailResponse contentAreaDetailResponse; // 지역 ID
     private List<Long> contentIds; // 여행지 목록

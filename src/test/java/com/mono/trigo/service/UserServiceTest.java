@@ -12,7 +12,7 @@ import com.mono.trigo.domain.user.impl.UserHelper;
 import com.mono.trigo.domain.user.repository.UserRepository;
 import com.mono.trigo.domain.review.repository.ReviewRepository;
 
-import com.mono.trigo.web.plan.dto.PlanListResponse;
+import com.mono.trigo.web.plan.dto.PlansResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
 import com.mono.trigo.web.user.dto.SignupRequest;
@@ -29,8 +29,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.LocalDate;
@@ -176,12 +174,12 @@ class UserServiceTest {
         when(planRepository.findByUserId(1L)).thenReturn(List.of(plan));
 
         // When
-        PlanListResponse responses = userService.getPlansByUserId(1L);
+        PlansResponse responses = userService.getPlansByUserId(1L);
 
         // Then
-        assertEquals(1, responses.getPlanResponseList().size());
-        assertEquals(plan.getTitle(), responses.getPlanResponseList().get(0).getTitle());
-        assertEquals(plan.getIsPublic(), responses.getPlanResponseList().get(0).getIsPublic());
+        assertEquals(1, responses.getPlans().size());
+        assertEquals(plan.getTitle(), responses.getPlans().get(0).getTitle());
+        assertEquals(plan.getIsPublic(), responses.getPlans().get(0).getIsPublic());
     }
 
     @Test

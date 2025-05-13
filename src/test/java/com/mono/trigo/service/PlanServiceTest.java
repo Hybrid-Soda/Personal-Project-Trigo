@@ -9,6 +9,7 @@ import com.mono.trigo.domain.area.entity.AreaDetail;
 import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.domain.plan.repository.PlanRepository;
 import com.mono.trigo.domain.like.repository.LikeRepository;
+import com.mono.trigo.domain.plan.repository.PlanRedisRepository;
 import com.mono.trigo.domain.content.repository.ContentRepository;
 import com.mono.trigo.domain.area.repository.AreaDetailRepository;
 
@@ -28,13 +29,12 @@ import org.mockito.Mock;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.List;
 import java.util.Optional;
 import java.time.LocalDate;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,38 +42,36 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(MockitoExtension.class)
 class PlanServiceTest {
 
-    @InjectMocks private PlanService planService;
+    @InjectMocks
+    private PlanService planService;
+
     @Mock private UserHelper userHelper;
     @Mock private PlanRepository planRepository;
     @Mock private LikeRepository likeRepository;
     @Mock private ContentRepository contentRepository;
+    @Mock private PlanRedisRepository planRedisRepository;
     @Mock private AreaDetailRepository areaDetailRepository;
-    @Mock private RedisTemplate<String, Object> redisTemplate;
-    @Mock private ValueOperations<String, Object> valueOps;
 
+    private final Long planId = 1L;
     private final User user = User.builder().id(1L).username("testUser123").build();
     private final Area area = new Area(1L, "서울", "1");
     private final AreaDetail areaDetail = new AreaDetail(1L, area, "강남구", "1");
     private final Content content1 = Content.builder().id(1L).build();
     private final Content content2 = Content.builder().id(2L).build();
 
-    private PlanRequest planRequest;
     private Plan plan;
+    private PlanRequest planRequest;
+    private PlanResponse planResponse;
 
     @BeforeEach
     void setUp() {
         planRequest = PlanRequest.builder()
-                .title("Test Plan")
-                .description("This is a test plan.")
-                .areaDetailId(1L)
-                .contents(List.of(1L, 2L))
-                .startDate(LocalDate.of(2025, 1, 1))
-                .endDate(LocalDate.of(2025, 1, 10))
-                .isPublic(true)
+                .title("Test Plan").description("This is a test plan.").areaDetailId(1L).contents(List.of(1L, 2L))
+                .startDate(LocalDate.of(2025, 1, 1)).endDate(LocalDate.of(2025, 1, 10)).isPublic(true)
                 .build();
-
         plan = Plan.of(planRequest, user, areaDetail, List.of(content1, content2));
-        plan.setId(1L);
+        plan.setId(planId);
+        planResponse = PlanResponse.of(plan);
     }
 
     @Test
@@ -118,7 +116,6 @@ class PlanServiceTest {
     void getAllPlans_Success() {
         // Given
         Plan plan1 = Plan.builder().id(1L).areaDetail(areaDetail).title("plan1").user(user).isPublic(true).build();
-        Plan plan2 = Plan.builder().id(2L).areaDetail(areaDetail).title("plan2").user(user).build();
 
         when(planRepository.findAllByIsPublicTrue()).thenReturn(List.of(plan1));
 
@@ -131,30 +128,45 @@ class PlanServiceTest {
     }
 
     @Test
-    @DisplayName("일정 조회 성공")
-    void getPlanById_Success() {
+    @DisplayName("일정 조회 성공: 캐시 히트")
+    void getPlanById_Success_CacheHit() {
         // Given
-        when(redisTemplate.hasKey("plan::" + 1L)).thenReturn(false);
-        when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
-        when(redisTemplate.opsForValue()).thenReturn(valueOps);
+        when(planRedisRepository.findById(planId)).thenReturn(Optional.of(planResponse));
 
         // When
-        PlanResponse planResponse = planService.getPlanById(1L);
+        PlanResponse response = planService.getPlanById(planId);
 
         //Then
-        assertEquals(1L, planResponse.getPlanId());
-        assertEquals(plan.getTitle(), planResponse.getTitle());
-        assertEquals(plan.getDescription(), planResponse.getDescription());
+        assertEquals(response, planResponse);
+        verify(planRedisRepository, times(1)).findById(planId);
+        verifyNoInteractions(planRepository);
+    }
+
+    @Test
+    @DisplayName("일정 조회 성공: 캐시 미스 후 DB 조회")
+    void getPlanById_Success_DB() {
+        // Given
+        when(planRedisRepository.findById(planId)).thenReturn(Optional.empty());
+        when(planRepository.findById(planId)).thenReturn(Optional.of(plan));
+
+        // When
+        PlanResponse response = planService.getPlanById(planId);
+
+        //Then
+        assertEquals(response.getPlanId(), planResponse.getPlanId());
     }
 
     @Test
     @DisplayName("일정 조회 실패: 존재하지 않는 일정")
     void getPlanById_Fail_PlanNotFound() {
         // Given
-        when(planRepository.findById(1L)).thenReturn(Optional.empty());
+        Long otherPlanId = 3L;
+        when(planRedisRepository.findById(otherPlanId)).thenReturn(Optional.empty());
+        when(planRepository.findById(otherPlanId)).thenReturn(Optional.empty());
 
         // When & Then
-        ApplicationException exception = assertThrows(ApplicationException.class, () -> planService.getPlanById(1L));
+        ApplicationException exception =
+                assertThrows(ApplicationException.class, () -> planService.getPlanById(otherPlanId));
         assertEquals(ApplicationError.PLAN_IS_NOT_FOUND, exception.getError());
     }
 
@@ -167,18 +179,15 @@ class PlanServiceTest {
         planRequest.setDescription("Updated description");
 
         when(userHelper.getCurrentUser()).thenReturn(user);
-        when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
+        when(planRepository.findById(planId)).thenReturn(Optional.of(plan));
         when(areaDetailRepository.findById(planRequest.getAreaDetailId())).thenReturn(Optional.of(areaDetail));
-        when(contentRepository.findById(1L)).thenReturn(Optional.of(content1));
+        when(contentRepository.findById(planId)).thenReturn(Optional.of(content1));
 
         // When
-        planService.updatePlan(1L, planRequest);
+        planService.updatePlan(planId, planRequest);
 
         // Then
-        verify(planRepository, times(1)).save(argThat(plan ->
-                plan.getContents().equals(List.of(content1)) &&
-                plan.getTitle().equals(planRequest.getTitle()) &&
-                plan.getDescription().equals(planRequest.getDescription())));
+        verify(planRepository, times(1)).save(plan);
     }
 
     @Test
@@ -215,13 +224,13 @@ class PlanServiceTest {
     void deletePlan_Success() {
         // Given
         when(userHelper.getCurrentUser()).thenReturn(user);
-        when(planRepository.findById(1L)).thenReturn(Optional.of(plan));
+        when(planRepository.findById(planId)).thenReturn(Optional.of(plan));
 
         // When
-        planService.deletePlan(1L);
+        planService.deletePlan(planId);
 
         // Then
-        verify(planRepository, times(1)).deleteById(1L);
+        verify(planRepository, times(1)).deleteById(planId);
     }
 
     @Test

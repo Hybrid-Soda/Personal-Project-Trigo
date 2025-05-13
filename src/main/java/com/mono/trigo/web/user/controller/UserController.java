@@ -1,6 +1,6 @@
 package com.mono.trigo.web.user.controller;
 
-import com.mono.trigo.web.plan.dto.PlanListResponse;
+import com.mono.trigo.web.plan.dto.PlansResponse;
 import com.mono.trigo.web.user.dto.*;
 import com.mono.trigo.web.user.service.UserService;
 import com.mono.trigo.web.user.service.ReissueService;
@@ -56,8 +56,8 @@ public class UserController {
 
     // 작성한 일정 조회
     @GetMapping("/{userId}/plans")
-    public ResponseEntity<PlanListResponse> getPlansByUserId(@PathVariable Long userId) {
-        PlanListResponse response = userService.getPlansByUserId(userId);
+    public ResponseEntity<PlansResponse> getPlansByUserId(@PathVariable Long userId) {
+        PlansResponse response = userService.getPlansByUserId(userId);
         return ResponseEntity.status(200).body(response);
     }
 

@@ -6,6 +6,7 @@ import com.mono.trigo.web.plan.service.PlanService;
 import com.mono.trigo.web.plan.dto.CreatePlanResponse;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.http.ResponseEntity;
@@ -40,35 +41,36 @@ public class PlanController {
 
     // 특정 일정 조회
     @GetMapping("/{planId}")
-    public ResponseEntity<PlanResponse> getPlanById(@PathVariable Long planId) {
+    public ResponseEntity<PlanResponse> getPlanById(@PathVariable @Min(1) Long planId) {
         PlanResponse response = planService.getPlanById(planId);
         return ResponseEntity.status(200).body(response);
     }
 
     // 일정 수정
     @PutMapping("/{planId}")
-    public ResponseEntity<String> updatePlan(@PathVariable Long planId, @Valid @RequestBody PlanRequest planRequest) {
+    public ResponseEntity<String> updatePlan(
+            @PathVariable @Min(1) Long planId, @Valid @RequestBody PlanRequest planRequest) {
         planService.updatePlan(planId, planRequest);
         return ResponseEntity.status(200).body("Plan updated successfully");
     }
 
     // 일정 삭제
     @DeleteMapping("/{planId}")
-    public ResponseEntity<Void> deletePlan(@PathVariable Long planId) {
+    public ResponseEntity<Void> deletePlan(@PathVariable @Min(1) Long planId) {
         planService.deletePlan(planId);
         return ResponseEntity.noContent().build();
     }
 
     // 일정 좋아요
     @PostMapping("/{planId}/likes")
-    public ResponseEntity<String> createLikePlan(@PathVariable Long planId) {
+    public ResponseEntity<String> createLikePlan(@PathVariable @Min(1) Long planId) {
         planService.createLikePlan(planId);
         return ResponseEntity.status(201).body("Like created successfully");
     }
 
     // 일정 좋아요 해제
     @DeleteMapping("/{planId}/likes")
-    public ResponseEntity<Void> deleteLikePlan(@PathVariable Long planId) {
+    public ResponseEntity<Void> deleteLikePlan(@PathVariable @Min(1) Long planId) {
         planService.deleteLikePlan(planId);
         return ResponseEntity.noContent().build();
     }

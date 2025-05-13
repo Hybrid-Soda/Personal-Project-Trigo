@@ -2,7 +2,6 @@ package com.mono.trigo.web.user.service;
 
 import com.mono.trigo.domain.plan.entity.Plan;
 import com.mono.trigo.domain.plan.repository.PlanRepository;
-import com.mono.trigo.domain.review.repository.ReviewRedisRepository;
 import com.mono.trigo.domain.user.entity.User;
 import com.mono.trigo.domain.user.impl.UserHelper;
 import com.mono.trigo.domain.user.repository.UserRepository;
@@ -12,7 +11,7 @@ import com.mono.trigo.domain.review.repository.ReviewRepository;
 import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.mono.trigo.web.exception.advice.ApplicationException;
 
-import com.mono.trigo.web.plan.dto.PlanListResponse;
+import com.mono.trigo.web.plan.dto.PlansResponse;
 import com.mono.trigo.web.plan.dto.PlanResponse;
 import com.mono.trigo.web.user.dto.UserRequest;
 import com.mono.trigo.web.user.dto.UserResponse;
@@ -25,7 +24,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,12 +71,12 @@ public class UserService {
         userRepository.deleteById(userId);
     }
 
-    public PlanListResponse getPlansByUserId(Long userId) {
+    public PlansResponse getPlansByUserId(Long userId) {
 
         if (!userRepository.existsById(userId)) throw new ApplicationException(ApplicationError.USER_IS_NOT_FOUND);
 
         List<Plan> plans = planRepository.findByUserId(userId);
-        return PlanListResponse.of(plans.stream()
+        return new PlansResponse(plans.stream()
                 .map(PlanResponse::of)
                 .collect(Collectors.toList()));
     }
