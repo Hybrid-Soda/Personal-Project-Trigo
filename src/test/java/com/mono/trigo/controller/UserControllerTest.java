@@ -42,7 +42,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
-public class UserControllerTest {
+class UserControllerTest {
 
     @InjectMocks private UserController userController;
     @Mock private UserService userService;
@@ -154,11 +154,11 @@ public class UserControllerTest {
         // Then
         resultActions
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.reviewResponseList.length()").value(2))
-                .andExpect(jsonPath("$.reviewResponseList[0].reviewId").value(1L))
-                .andExpect(jsonPath("$.reviewResponseList[0].reviewContent").value("Great place!"))
-                .andExpect(jsonPath("$.reviewResponseList[1].reviewId").value(2L))
-                .andExpect(jsonPath("$.reviewResponseList[1].reviewContent").value("pool.."));
+                .andExpect(jsonPath("$.reviews.length()").value(2))
+                .andExpect(jsonPath("$.reviews[0].reviewId").value(1L))
+                .andExpect(jsonPath("$.reviews[0].reviewContent").value("Great place!"))
+                .andExpect(jsonPath("$.reviews[1].reviewId").value(2L))
+                .andExpect(jsonPath("$.reviews[1].reviewContent").value("pool.."));
     }
 
     @Test

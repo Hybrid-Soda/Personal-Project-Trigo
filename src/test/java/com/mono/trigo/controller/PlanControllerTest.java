@@ -32,7 +32,7 @@ import java.util.List;
 import java.time.LocalDate;
 
 @ExtendWith(MockitoExtension.class)
-public class PlanControllerTest {
+class PlanControllerTest {
 
     @InjectMocks
     private PlanController planController;
