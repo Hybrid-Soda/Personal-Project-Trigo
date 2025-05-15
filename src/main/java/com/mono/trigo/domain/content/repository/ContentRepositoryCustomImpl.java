@@ -2,14 +2,21 @@ package com.mono.trigo.domain.content.repository;
 
 import com.mono.trigo.domain.content.entity.Content;
 import com.mono.trigo.web.content.dto.ContentSearchCondition;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
+
+import com.mono.trigo.web.exception.advice.ApplicationException;
+import com.mono.trigo.web.exception.entity.ApplicationError;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
+
+import jakarta.persistence.LockModeType;
 import jakarta.persistence.EntityManager;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,6 +29,21 @@ public class ContentRepositoryCustomImpl implements ContentRepositoryCustom {
 
     public ContentRepositoryCustomImpl(EntityManager em) {
         this.queryFactory = new JPAQueryFactory(em);
+    }
+
+    @Override
+    @Transactional
+    public Content findByIdWithPessimisticLock(Long id) {
+        Content result = queryFactory
+                .selectFrom(content)
+                .where(content.id.eq(id))
+                .setLockMode(LockModeType.PESSIMISTIC_WRITE)
+                .fetchOne();
+
+        if (result == null) {
+            throw new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND);
+        }
+        return result;
     }
 
     public Page<Content> searchContents(ContentSearchCondition condition, Pageable pageable) {

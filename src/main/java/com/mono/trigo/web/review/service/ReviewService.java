@@ -73,6 +73,7 @@ public class ReviewService {
         if (cachedResponse.isPresent()) return cachedResponse.get();
 
         // DB 조회
+        getContent(contentId);
         ContentReviewsResponse contentReviewsResponse =
                 new ContentReviewsResponse(contentId, reviewRepository.findByContentId(contentId));
 
@@ -141,8 +142,7 @@ public class ReviewService {
     }
 
     public Content getContent(Long contentId) {
-        return contentRepository.findById(contentId)
-                .orElseThrow(() -> new ApplicationException(ApplicationError.CONTENT_IS_NOT_FOUND));
+        return contentRepository.findByIdWithPessimisticLock(contentId);
     }
 
     public Review getReview(Long reviewId) {
