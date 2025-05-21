@@ -26,6 +26,7 @@
   <img src="https://img.shields.io/badge/spring_boot-6DB33F?style=for-the-badge&logo=spring-boot&logoColor=white">
   <img src="https://img.shields.io/badge/JPA-6DB33F?style=for-the-badge&logo=spring&logoColor=white">
   <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
+  <img src="https://img.shields.io/badge/redis-FF4438?style=for-the-badge&logo=redis&logoColor=white">
 </div>
 
 <div>
@@ -81,13 +82,17 @@
   - access token과 refresh token으로 나누어 단계적 권한 축소를 적용
   - access token은 응답 헤더에 포함해 CSRF를 차단하고, XSS에 의한 로컬 저장소 탈취 위험 제거
   - refresh token은 HttpOnly 브라우저 쿠키로 관리하며, DB에 저장하다 로그아웃 시 제거해 즉각적 토큰 무효화를 적용
+- **Redis를 이용해 더 빠른 조회 가능**
+  - 네트워크 기반 분산 캐시로 확장성, 가용성, 영속성 측면에서 양호함을 보여 채택
+  - 클라우드 환경의 여행 일정 관리 서비스에 많은 유저가 동시에 접속하고, 일정 등록/조회/변경 등을 처리해야 했으므로,
+  그에 맞는 클라이언트인 lettuce 사용
 
 ## 디렉터리 구조
 ```
     ├── src
     │   ├── main
     │   │   ├── java/com/mono/trigo         # 애플리케이션 진입점 및 패키지 구조
-    │   │   │   ├── common/aduit            # JPA 감사 로직 구현
+    │   │   │   ├── common                  # 공통 활용 모듈
     │   │   │   ├── domain                  # 도메인 모델 및 엔티티 클래스
     │   │   │   ├── openApi                 # 외부 TourAPI 연동 로직
     │   │   │   └── web                     # REST 컨트롤러 및 요청 처리 계층
